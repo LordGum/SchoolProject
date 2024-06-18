@@ -13,7 +13,9 @@ import androidx.compose.ui.Modifier
 import com.example.schoolproject.data.TodoItemsRepositoryImpl
 import com.example.schoolproject.domain.entities.TodoItem
 import com.example.schoolproject.presentation.Item
+import com.example.schoolproject.presentation.MainScreen
 import com.example.schoolproject.presentation.MainScreenContent
+import com.example.schoolproject.presentation.MainViewModel
 import com.example.schoolproject.ui.theme.AppTheme
 import com.example.schoolproject.ui.theme.SchoolProjectTheme
 import kotlinx.coroutines.CoroutineScope
@@ -28,10 +30,14 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
+            val viewModel = MainViewModel(application)
             SchoolProjectTheme {
-                MainScreenContent()
-                Item()
-
+                MainScreen(
+                    viewModel,
+                    onTodoItemClick = {
+                        Log.d("MATAG", "adding new Item")
+                    }
+                )
             }
         }
     }

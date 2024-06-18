@@ -1,7 +1,6 @@
 package com.example.schoolproject.presentation
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -30,16 +29,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.schoolproject.R
+import com.example.schoolproject.domain.entities.TodoItem
 import com.example.schoolproject.ui.theme.AppTheme
 
-@Preview
 @Composable
-fun Item() {
-    val checked = remember { mutableStateOf(false) }
+fun Item(item: TodoItem) {
+    val checked = remember { mutableStateOf(item.isCompleted) }
+    val isHigh = (item.priority == TodoItem.Priority.HIGH)
 
     Row(
         modifier = Modifier
@@ -49,16 +48,17 @@ fun Item() {
         verticalAlignment = Alignment.CenterVertically
     ) {
         CustomCheckbox(
-            checked = checked.value, isHigh = false, onClick = {
+            checked = checked.value, isHigh = isHigh, onClick = {
                 checked.value = it
             }
         )
         Spacer(modifier = Modifier.width(12.dp))
         Text(
             modifier = Modifier.weight(10f),
-            text = "Купи, что нибудь",
+            text = item.text,
             style = TextStyle(
-                textDecoration = TextDecoration.LineThrough,
+                textDecoration = if (checked.value) TextDecoration.LineThrough
+                                 else TextDecoration.None,
                 fontFamily = FontFamily.Default,
                 fontSize = 16.sp,
                 color = if (checked.value) AppTheme.colorScheme.tertiary

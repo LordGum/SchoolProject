@@ -3,7 +3,7 @@ package com.example.schoolproject.domain.entities
 import java.util.Date
 
 data class TodoItem(
-    val id: String,
+    val id: String = UNDEFINED_ID,
     var text: String,
     val priority: Priority,
     var isCompleted: Boolean,
@@ -13,5 +13,8 @@ data class TodoItem(
 ) {
     enum class Priority {
         LOW, NORMAL, HIGH
+    }
+    companion object {
+        const val UNDEFINED_ID = "0"
     }
 }
