@@ -5,8 +5,10 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.material3.Text
 import com.example.schoolproject.data.TodoItemsRepositoryImpl
 import com.example.schoolproject.domain.entities.TodoItem
+import com.example.schoolproject.ui.theme.AppTheme
 import com.example.schoolproject.ui.theme.SchoolProjectTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -34,7 +36,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             SchoolProjectTheme {
-                //start commit
+                Text(text = "Hello", color = AppTheme.colorScheme.primary)
             }
         }
     }

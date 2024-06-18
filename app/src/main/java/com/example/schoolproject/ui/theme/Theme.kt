@@ -1,58 +1,53 @@
 package com.example.schoolproject.ui.theme
 
-import android.app.Activity
-import android.os.Build
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
-import androidx.compose.material3.lightColorScheme
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.graphics.Color
 
-private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+private val DarkColorScheme = CustomColorScheme(
+    primary = Color(0xFFFFFFFF),
+    secondary = Color(0x99FFFFFF),
+    tertiary = Color(0x66FFFFFF),
+    disable = Color(0x26FFFFFF),
+    separator = Color(0xFFFFFFFF),
+    overlay = Color(0x52000000),
+    lightGray = Color(0xFF48484A),
+    backPrimary = Color(0xFF161618),
+    backSecondary = Color(0xFF252528),
+    backElevated = Color(0xFF3C3C3F)
 )
 
-private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+private val LightColorScheme = CustomColorScheme(
+    primary = Color(0xFF992233),
+    secondary = Color(0x99000000),
+    tertiary = Color(0x4D000000),
+    disable = Color(0x26000000),
+    separator = Color(0x33000000),
+    overlay = Color(0x0F000000),
+    lightGray = Color(0xFFD1D1D6),
+    backPrimary = Color(0xFFF7F6F2),
+    backSecondary = Color(0xFFFFFFFF),
+    backElevated = Color(0xFFFFFFFF)
 )
 
 @Composable
 fun SchoolProjectTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
+    val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
 
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
-    }
-
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography,
+    val rippleIndicator = rememberRipple()
+    CompositionLocalProvider(
+        LocalCustomColorScheme provides colorScheme,
+        LocalIndication provides rippleIndicator,
         content = content
     )
+}
+object AppTheme {
+    val colorScheme: CustomColorScheme
+        @Composable get() = LocalCustomColorScheme.current
 }
