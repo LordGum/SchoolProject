@@ -1,5 +1,6 @@
 package com.example.schoolproject.domain
 
+import com.example.schoolproject.domain.entities.TodoItem
 import kotlinx.coroutines.flow.Flow
 
 interface TodoItemsRepository  {

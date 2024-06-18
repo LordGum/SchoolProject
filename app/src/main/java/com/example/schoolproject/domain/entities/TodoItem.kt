@@ -1,4 +1,4 @@
-package com.example.schoolproject.domain
+package com.example.schoolproject.domain.entities
 
 import java.util.Date
 
