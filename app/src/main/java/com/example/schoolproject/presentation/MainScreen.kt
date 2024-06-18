@@ -1,9 +1,11 @@
 package com.example.schoolproject.presentation
 
+import android.util.Log
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,17 +17,25 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.Card
+import androidx.compose.material3.DismissDirection
+import androidx.compose.material3.DismissValue
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SwipeToDismiss
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDismissState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -37,8 +47,9 @@ import com.example.schoolproject.R
 import com.example.schoolproject.domain.entities.TodoItem
 import com.example.schoolproject.ui.theme.AppTheme
 import com.example.schoolproject.ui.theme.Blue
+import com.example.schoolproject.ui.theme.Green
+import com.example.schoolproject.ui.theme.Red
 import java.util.Date
-
 
 @Composable
 fun MainScreen(
@@ -51,7 +62,8 @@ fun MainScreen(
         is MainScreenState.TodoList -> {
             MainScreenContent(
                 list = currentState.todoList,
-                onTodoItemClickListener = onTodoItemClick
+                onTodoItemClickListener = onTodoItemClick,
+                viewModel = viewModel
             )
         }
         is MainScreenState.Initial -> {
@@ -60,11 +72,11 @@ fun MainScreen(
     }
 }
 
-
 @Composable
 fun MainScreenContent(
     list: List<TodoItem>,
-    onTodoItemClickListener: (TodoItem) -> Unit
+    onTodoItemClickListener: (TodoItem) -> Unit,
+    viewModel: MainViewModel
 ) {
     Scaffold(
         containerColor = AppTheme.colorScheme.backPrimary,
@@ -101,7 +113,7 @@ fun MainScreenContent(
         ) {
             Title()
             UnderTitle()
-            List(list)
+            List(list, viewModel)
         }
     }
 }
@@ -150,7 +162,6 @@ fun InitialScreen(onTodoItemClickListener: (TodoItem) -> Unit) {
     }
 }
 
-
 @Composable
 fun Title() {
     Box(modifier = Modifier
@@ -166,7 +177,6 @@ fun Title() {
         )
     }
 }
-
 
 @Composable
 fun UnderTitle() {
@@ -205,9 +215,11 @@ fun UnderTitle() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun List(
-    list: List<TodoItem>
+    list: List<TodoItem>,
+    viewModel: MainViewModel
 ) {
     Card(
         modifier = Modifier.padding(8.dp),
@@ -217,8 +229,68 @@ fun List(
             modifier = Modifier.fillMaxWidth()
         ) {
             items(items = list, key = { it.id }) { item ->
-                Item(item)
+                val dismissState = rememberDismissState(
+                    initialValue = DismissValue.Default
+                )
+                if (dismissState.isDismissed(DismissDirection.StartToEnd)) {
+                    viewModel.doneTodoItem(item)
+                }
+                if (dismissState.isDismissed(DismissDirection.EndToStart)) {
+                    viewModel.deleteTodoItem(item.id)
+                }
+                SwipeToDismiss(
+                    modifier = Modifier.animateItemPlacement(),
+                    state = dismissState,
+                    background = {
+                        when(dismissState.targetValue) {
+                            DismissValue.DismissedToEnd -> DoneBackground()
+                            DismissValue.DismissedToStart -> DeleteBackground()
+                            DismissValue.Default -> AppTheme.colorScheme.backPrimary
+                        }
+                    },
+                    directions = setOf(DismissDirection.EndToStart, DismissDirection.StartToEnd),
+                    dismissContent = {
+                        Item(
+                            item = item,
+                            viewModel = viewModel
+                        )
+                    }
+                )
             }
         }
+    }
+}
+
+@Composable
+fun DeleteBackground() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = Red)
+            .padding(horizontal = 16.dp),
+        contentAlignment = Alignment.CenterEnd
+    ) {
+        Icon(
+            imageVector = Icons.Default.Delete,
+            contentDescription = stringResource(R.string.delete_desc),
+            tint = Color.White
+        )
+    }
+}
+
+@Composable
+fun DoneBackground() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = Green)
+            .padding(horizontal = 16.dp),
+        contentAlignment = Alignment.CenterStart
+    ) {
+        Icon(
+            imageVector = Icons.Default.Done,
+            contentDescription = stringResource(R.string.delete_desc),
+            tint = Color.White
+        )
     }
 }

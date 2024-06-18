@@ -6,4 +6,6 @@
     <string name="underlable">Выполнено - %s</string>
     <string name="visibility_button_desc">visibility button</string>
     <string name="no_notes">Пока записей нет</string>
+    <string name="deadline_date">дедлайн: %s</string>
+    <string name="delete_desc">delete</string>
 </resources>

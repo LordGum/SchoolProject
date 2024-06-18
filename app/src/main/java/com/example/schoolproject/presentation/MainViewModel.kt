@@ -7,10 +7,13 @@ import com.example.schoolproject.data.TodoItemsRepositoryImpl
 import com.example.schoolproject.domain.entities.TodoItem
 import com.example.schoolproject.domain.usecases.AddTodoItemUseCase
 import com.example.schoolproject.domain.usecases.DeleteTodoItemUseCase
+import com.example.schoolproject.domain.usecases.GetTodoItemUseCase
 import com.example.schoolproject.domain.usecases.GetTodoListUseCase
+import com.example.schoolproject.domain.usecases.RefactorTodoItemUseCase
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -22,6 +25,7 @@ class MainViewModel(application: Application): AndroidViewModel(application) {
     private val getTodoListUseCase = GetTodoListUseCase(repository)
     private val addTodoItemUseCase = AddTodoItemUseCase(repository)
     private val deleteTodoItemUseCase = DeleteTodoItemUseCase(repository)
+    private val refactorTodoItemUseCase = RefactorTodoItemUseCase(repository)
 
     private val exceptionHandler = CoroutineExceptionHandler { _, _ ->
         Log.d("MainViewModel", "Exception caught by exception handler")
@@ -42,5 +46,16 @@ class MainViewModel(application: Application): AndroidViewModel(application) {
         scope.launch(exceptionHandler) {
             deleteTodoItemUseCase(id)
         }
+    }
+
+    fun doneTodoItem(todoItem: TodoItem) {
+        scope.launch(exceptionHandler) {
+            refactorTodoItemUseCase(todoItem = todoItem.copy(isCompleted = !todoItem.isCompleted))
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        scope.cancel()
     }
 }

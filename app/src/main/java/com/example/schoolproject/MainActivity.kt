@@ -29,6 +29,24 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
+        val repository  = TodoItemsRepositoryImpl(applicationContext)
+        val scope = CoroutineScope(Dispatchers.IO)
+        scope.launch {
+//            repository.addTodoItem(TodoItem(
+//                text = "hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello",
+//                priority = TodoItem.Priority.NORMAL,
+//                isCompleted = false,
+//                createdDate = Date(40978845356)))
+//            repository.addTodoItem(
+//                TodoItem(
+//                    text = "hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello",
+//                    priority = TodoItem.Priority.NORMAL,
+//                    isCompleted = true,
+//                    createdDate = Date(40978845356),
+//                    deadline = Date()
+//                ))
+        }
+
         setContent {
             val viewModel = MainViewModel(application)
             SchoolProjectTheme {
