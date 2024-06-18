@@ -12,7 +12,7 @@ private val DarkColorScheme = CustomColorScheme(
     secondary = Color(0x99FFFFFF),
     tertiary = Color(0x66FFFFFF),
     disable = Color(0x26FFFFFF),
-    separator = Color(0xFFFFFFFF),
+    separator = Color(0x52FFFFFF),
     overlay = Color(0x52000000),
     lightGray = Color(0xFF48484A),
     backPrimary = Color(0xFF161618),
@@ -21,7 +21,7 @@ private val DarkColorScheme = CustomColorScheme(
 )
 
 private val LightColorScheme = CustomColorScheme(
-    primary = Color(0xFF992233),
+    primary = Color(0xFF000000),
     secondary = Color(0x99000000),
     tertiary = Color(0x4D000000),
     disable = Color(0x26000000),

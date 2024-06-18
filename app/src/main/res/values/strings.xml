@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">SchoolProject</string>
+    <string name="info_button_description">info button of todo item</string>
+    <string name="fgd_lk">fgd;lk</string>
+    <string name="title">Мои дела</string>
+    <string name="underlable">Выполнено - %s</string>
+    <string name="visibility_button_desc">visibility button</string>
 </resources>
