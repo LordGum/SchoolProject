@@ -8,6 +8,7 @@ sealed class MainScreenState {
     data object Loading: MainScreenState()
 
     data class TodoList(
-        val todoList: List<TodoItem>
+        val todoList: List<TodoItem>,
+        var count: Int
     ): MainScreenState()
 }

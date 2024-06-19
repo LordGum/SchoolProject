@@ -58,13 +58,23 @@ fun MainScreen(
     onTodoItemClick: (TodoItem) -> Unit
 ) {
     val screenState = viewModel.screenState.collectAsState(MainScreenState.Loading)
+    var currentState = screenState.value
+    if (currentState is MainScreenState.TodoList) {
+        if (currentState.todoList.isEmpty()) currentState = MainScreenState.Initial
+    }
+    val visibilityState = remember { mutableStateOf(true) }
 
-    when (val currentState = screenState.value) {
+    when (currentState) {
         is MainScreenState.TodoList -> {
             MainScreenContent(
                 list = currentState.todoList,
                 onTodoItemClickListener = onTodoItemClick,
-                viewModel = viewModel
+                viewModel = viewModel,
+                countDone = currentState.count,
+                onVisibilityIconClick = {
+                    visibilityState.value = !visibilityState.value
+                },
+                visibilityState.value
             )
         }
         is MainScreenState.Loading -> {
@@ -80,7 +90,10 @@ fun MainScreen(
 fun MainScreenContent(
     list: List<TodoItem>,
     onTodoItemClickListener: (TodoItem) -> Unit,
-    viewModel: MainViewModel
+    viewModel: MainViewModel,
+    countDone: Int,
+    onVisibilityIconClick: () -> Unit,
+    visibilityState: Boolean
 ) {
     Scaffold(
         containerColor = AppTheme.colorScheme.backPrimary,
@@ -116,8 +129,8 @@ fun MainScreenContent(
                 .padding(paddingValues)
         ) {
             Title()
-            UnderTitle(viewModel, 111) //TODO
-            List(list, viewModel, onTodoItemClickListener)
+            UnderTitle(countDone, onVisibilityIconClick, visibilityState)
+            List(list, viewModel, onTodoItemClickListener, visibilityState)
         }
     }
 }
@@ -153,18 +166,25 @@ fun InitialScreen(
         },
         floatingActionButtonPosition = FabPosition.End,
     )  {paddingValues ->
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues),
-            contentAlignment = Alignment.Center
+                .padding(paddingValues)
         ) {
-            Text(
-                text = stringResource(R.string.no_notes),
-                fontSize = 16.sp,
-                fontFamily = FontFamily.Default,
-                color = AppTheme.colorScheme.primary
-            )
+            Title()
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = stringResource(R.string.no_notes),
+                    fontSize = 16.sp,
+                    fontFamily = FontFamily.Default,
+                    color = AppTheme.colorScheme.primary
+                )
+            }
         }
     }
 }
@@ -187,12 +207,10 @@ fun Title() {
 
 @Composable
 fun UnderTitle(
-    viewModel: MainViewModel,
-    count: Int
+    count: Int,
+    onVisibilityIconClick: () -> Unit,
+    visibilityState: Boolean
 ) {
-    val visibility = remember {
-        mutableStateOf(true)
-    }
     val text = stringResource(R.string.underlable)
     val finalText = String.format(text, count)
     Box(
@@ -217,13 +235,13 @@ fun UnderTitle(
             )
             Icon(
                 painter = painterResource(
-                    id = if (visibility.value) R.drawable.ic_visibility
+                    id = if (visibilityState) R.drawable.ic_visibility
                     else R.drawable.ic_visibility_off
                 ),
                 tint = Blue,
                 contentDescription = stringResource(R.string.visibility_button_desc),
                 modifier = Modifier.clickable {
-                    //TODO
+                    onVisibilityIconClick()
                 }
             )
         }
@@ -235,7 +253,8 @@ fun UnderTitle(
 fun List(
     list: List<TodoItem>,
     viewModel: MainViewModel,
-    onTodoItemClickListener: (TodoItem) -> Unit
+    onTodoItemClickListener: (TodoItem) -> Unit,
+    visibilityState: Boolean
 ) {
     Card(
         modifier = Modifier.padding(8.dp),
@@ -245,34 +264,39 @@ fun List(
             modifier = Modifier.fillMaxWidth()
         ) {
             items(items = list, key = { it.id }) { item ->
-                val dismissState = rememberDismissState(
-                    initialValue = DismissValue.Default
-                )
-                if (dismissState.isDismissed(DismissDirection.StartToEnd)) {
-                    viewModel.doneTodoItem(item)
-                }
-                if (dismissState.isDismissed(DismissDirection.EndToStart)) {
-                    viewModel.deleteTodoItem(item.id)
-                }
-                SwipeToDismiss(
-                    modifier = Modifier.animateItemPlacement(),
-                    state = dismissState,
-                    background = {
-                        when(dismissState.targetValue) {
-                            DismissValue.DismissedToEnd -> DoneBackground()
-                            DismissValue.DismissedToStart -> DeleteBackground()
-                            DismissValue.Default -> AppTheme.colorScheme.backPrimary
-                        }
-                    },
-                    directions = setOf(DismissDirection.EndToStart, DismissDirection.StartToEnd),
-                    dismissContent = {
-                        Item(
-                            item = item,
-                            viewModel = viewModel,
-                            onTodoItemClickListener = onTodoItemClickListener
-                        )
+                if (!item.isCompleted || visibilityState) {
+                    val dismissState = rememberDismissState(
+                        initialValue = DismissValue.Default
+                    )
+                    if (dismissState.isDismissed(DismissDirection.StartToEnd)) {
+                        viewModel.doneTodoItem(item)
                     }
-                )
+                    if (dismissState.isDismissed(DismissDirection.EndToStart)) {
+                        viewModel.deleteTodoItem(item.id)
+                    }
+                    SwipeToDismiss(
+                        modifier = Modifier.animateItemPlacement(),
+                        state = dismissState,
+                        background = {
+                            when (dismissState.targetValue) {
+                                DismissValue.DismissedToEnd -> DoneBackground()
+                                DismissValue.DismissedToStart -> DeleteBackground()
+                                DismissValue.Default -> AppTheme.colorScheme.backPrimary
+                            }
+                        },
+                        directions = setOf(
+                            DismissDirection.EndToStart,
+                            DismissDirection.StartToEnd
+                        ),
+                        dismissContent = {
+                            Item(
+                                item = item,
+                                viewModel = viewModel,
+                                onTodoItemClickListener = onTodoItemClickListener
+                            )
+                        }
+                    )
+                }
             }
         }
     }
@@ -310,4 +334,9 @@ fun DoneBackground() {
             tint = Color.White
         )
     }
+}
+
+@Composable
+fun DismissContent() {
+
 }

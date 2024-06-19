@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 class MainViewModel(
@@ -30,7 +31,6 @@ class MainViewModel(
     private val refactorTodoItemUseCase = RefactorTodoItemUseCase(repository)
 
     private val _count = MutableStateFlow(0)
-    val count: StateFlow<Int> = _count.asStateFlow()
 
     private val exceptionHandler = CoroutineExceptionHandler { _, _ ->
         Log.d("MainViewModel", "Exception caught by exception handler")
@@ -38,7 +38,9 @@ class MainViewModel(
 
     val screenState = getTodoListUseCase()
         .filter { it.isNotEmpty() }
-        .map { MainScreenState.TodoList(todoList = it) as MainScreenState }
+        .onEach { list -> _count.value = list.count{ it.isCompleted } }
+        .map { MainScreenState.TodoList(todoList = it, _count.value) as MainScreenState }
+
 
     fun addTodoItem(todoItem: TodoItem) {
         viewModelScope.launch(exceptionHandler) {
@@ -53,8 +55,6 @@ class MainViewModel(
     }
 
     fun doneTodoItem(todoItem: TodoItem) {
-        if (todoItem.isCompleted) { if (_count.value > 0) _count.value-- }
-        else _count.value++
         viewModelScope.launch(exceptionHandler) {
             refactorTodoItemUseCase(todoItem = todoItem.copy(isCompleted = !todoItem.isCompleted))
         }
