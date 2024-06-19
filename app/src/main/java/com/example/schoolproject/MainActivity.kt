@@ -6,7 +6,11 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.example.schoolproject.data.TodoItemsRepositoryImpl
 import com.example.schoolproject.domain.entities.TodoItem
+import com.example.schoolproject.navigation.Screen
 import com.example.schoolproject.presentation.BaseScreen
+import com.example.schoolproject.presentation.detail.DetailColumn
+import com.example.schoolproject.presentation.detail.DetailScreen
+import com.example.schoolproject.presentation.detail.DetailViewModel
 import com.example.schoolproject.presentation.main.MainViewModel
 import com.example.schoolproject.ui.theme.SchoolProjectTheme
 import kotlinx.coroutines.CoroutineScope
@@ -41,9 +45,16 @@ class MainActivity : ComponentActivity() {
 //        }
 
         setContent {
-            val viewModel = MainViewModel(application)
+            val viewModel = DetailViewModel(application)
             SchoolProjectTheme {
-                BaseScreen()
+                DetailScreen(
+                    id = 1,
+                    viewModel = viewModel,
+                    onBackClickListener = {},
+                    onSaveClickListener = {}
+                )
+//                DetailColumn()
+//                BaseScreen()
 //                MainScreen(
 //                    viewModel,
 //                    onTodoItemClick = {

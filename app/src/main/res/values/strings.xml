@@ -11,4 +11,9 @@
     <string name="close_description">button to close detail screen of todo item</string>
     <string name="save">Сохранить</string>
     <string name="error">Произошла ошибка</string>
+    <string name="place_holder">Что-то надо сделать</string>
+    <string name="important">Важность</string>
+    <string name="deadline">Сделать до</string>
+    <string name="delete_button_desc">delete button</string>
+    <string name="delete">Удалить</string>
 </resources>

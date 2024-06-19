@@ -85,7 +85,6 @@ fun MainScreen(
         }
     }
 }
-
 @Composable
 fun MainScreenContent(
     list: List<TodoItem>,
@@ -122,12 +121,8 @@ fun MainScreenContent(
             }
         },
         floatingActionButtonPosition = FabPosition.End,
-    )  {paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
+    )  { _ ->
+        Column {
             Title()
             UnderTitle(countDone, onVisibilityIconClick, visibilityState)
             List(list, viewModel, onTodoItemClickListener, visibilityState)
@@ -334,9 +329,4 @@ fun DoneBackground() {
             tint = Color.White
         )
     }
-}
-
-@Composable
-fun DismissContent() {
-
 }
