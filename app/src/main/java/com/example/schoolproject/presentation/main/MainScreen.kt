@@ -1,8 +1,8 @@
-package com.example.schoolproject.presentation
+package com.example.schoolproject.presentation.main
 
-import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.schoolproject.R
 import com.example.schoolproject.domain.entities.TodoItem
+import com.example.schoolproject.presentation.ui_elements.LoadingScreen
 import com.example.schoolproject.ui.theme.AppTheme
 import com.example.schoolproject.ui.theme.Blue
 import com.example.schoolproject.ui.theme.Green
@@ -56,7 +57,7 @@ fun MainScreen(
     viewModel: MainViewModel,
     onTodoItemClick: (TodoItem) -> Unit
 ) {
-    val screenState = viewModel.screenState.collectAsState(MainScreenState.Initial)
+    val screenState = viewModel.screenState.collectAsState(MainScreenState.Loading)
 
     when (val currentState = screenState.value) {
         is MainScreenState.TodoList -> {
@@ -65,6 +66,9 @@ fun MainScreen(
                 onTodoItemClickListener = onTodoItemClick,
                 viewModel = viewModel
             )
+        }
+        is MainScreenState.Loading -> {
+            LoadingScreen()
         }
         is MainScreenState.Initial -> {
             InitialScreen(onTodoItemClickListener = onTodoItemClick)
@@ -112,14 +116,16 @@ fun MainScreenContent(
                 .padding(paddingValues)
         ) {
             Title()
-            UnderTitle()
-            List(list, viewModel)
+            UnderTitle(viewModel, 111) //TODO
+            List(list, viewModel, onTodoItemClickListener)
         }
     }
 }
 
 @Composable
-fun InitialScreen(onTodoItemClickListener: (TodoItem) -> Unit) {
+fun InitialScreen(
+    onTodoItemClickListener: (TodoItem) -> Unit
+) {
     Scaffold(
         containerColor = AppTheme.colorScheme.backPrimary,
         floatingActionButton = {
@@ -150,7 +156,8 @@ fun InitialScreen(onTodoItemClickListener: (TodoItem) -> Unit) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+                .padding(paddingValues),
+            contentAlignment = Alignment.Center
         ) {
             Text(
                 text = stringResource(R.string.no_notes),
@@ -179,10 +186,15 @@ fun Title() {
 }
 
 @Composable
-fun UnderTitle() {
+fun UnderTitle(
+    viewModel: MainViewModel,
+    count: Int
+) {
     val visibility = remember {
         mutableStateOf(true)
     }
+    val text = stringResource(R.string.underlable)
+    val finalText = String.format(text, count)
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -198,7 +210,7 @@ fun UnderTitle() {
         ) {
             Text(
                 modifier = Modifier,
-                text = stringResource(R.string.underlable),
+                text = finalText,
                 fontSize = 16.sp,
                 fontFamily = FontFamily.Default,
                 color = AppTheme.colorScheme.tertiary
@@ -209,7 +221,10 @@ fun UnderTitle() {
                     else R.drawable.ic_visibility_off
                 ),
                 tint = Blue,
-                contentDescription = stringResource(R.string.visibility_button_desc)
+                contentDescription = stringResource(R.string.visibility_button_desc),
+                modifier = Modifier.clickable {
+                    //TODO
+                }
             )
         }
     }
@@ -219,7 +234,8 @@ fun UnderTitle() {
 @Composable
 fun List(
     list: List<TodoItem>,
-    viewModel: MainViewModel
+    viewModel: MainViewModel,
+    onTodoItemClickListener: (TodoItem) -> Unit
 ) {
     Card(
         modifier = Modifier.padding(8.dp),
@@ -252,7 +268,8 @@ fun List(
                     dismissContent = {
                         Item(
                             item = item,
-                            viewModel = viewModel
+                            viewModel = viewModel,
+                            onTodoItemClickListener = onTodoItemClickListener
                         )
                     }
                 )

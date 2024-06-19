@@ -3,9 +3,12 @@
     <string name="info_button_description">info button of todo item</string>
     <string name="fgd_lk">fgd;lk</string>
     <string name="title">Мои дела</string>
-    <string name="underlable">Выполнено - %s</string>
+    <string name="underlable">Выполнено - %d</string>
     <string name="visibility_button_desc">visibility button</string>
     <string name="no_notes">Пока записей нет</string>
     <string name="deadline_date">дедлайн: %s</string>
     <string name="delete_desc">delete</string>
+    <string name="close_description">button to close detail screen of todo item</string>
+    <string name="save">Сохранить</string>
+    <string name="error">Произошла ошибка</string>
 </resources>

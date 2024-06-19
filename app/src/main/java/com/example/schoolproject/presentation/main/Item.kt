@@ -1,4 +1,4 @@
-package com.example.schoolproject.presentation
+package com.example.schoolproject.presentation.main
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -20,8 +20,6 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -44,11 +42,16 @@ import kotlinx.coroutines.launch
 @Composable
 fun Item(
     item: TodoItem,
-    viewModel: MainViewModel
+    viewModel: MainViewModel,
+    onTodoItemClickListener: (TodoItem) -> Unit
 ) {
     val checked = item.isCompleted
 
-    Column {
+    Column(
+        modifier = Modifier.clickable {
+            onTodoItemClickListener(item)
+        }
+    ) {
         Row(
             modifier = Modifier
                 .background(AppTheme.colorScheme.backSecondary)

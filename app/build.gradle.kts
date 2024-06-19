@@ -79,4 +79,7 @@ dependencies {
     implementation("androidx.room:room-ktx:$roomVersion")
     implementation("androidx.room:room-runtime:$roomVersion")
     kapt("androidx.room:room-compiler:$roomVersion")
+
+    //navigation
+    implementation("androidx.navigation:navigation-compose:2.7.7")
 }

@@ -24,11 +24,11 @@ class TodoItemsRepositoryImpl(
         todoDao.addTodoItem(mapper.entityToDbModel(todoItem))
     }
 
-    override suspend fun deleteTodoItem(id: String) {
+    override suspend fun deleteTodoItem(id: Int) {
         todoDao.deleteTodoItem(id)
     }
 
-    override suspend fun getTodoItem(id: String): TodoItem {
+    override suspend fun getTodoItem(id: Int): TodoItem {
         val dbModel = todoDao.getTodoItemInfo(id)
         return mapper.dbModelToEntity(dbModel)
     }

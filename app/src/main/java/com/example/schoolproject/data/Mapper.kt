@@ -6,7 +6,7 @@ import com.example.schoolproject.domain.entities.TodoItem
 class Mapper {
     fun entityToDbModel(todoItem: TodoItem): TodoItemDbModel {
         return TodoItemDbModel(
-            id = todoItem.id.toLong(),
+            id = todoItem.id,
             text = todoItem.text,
             priority = todoItem.priority,
             isCompleted = todoItem.isCompleted,
@@ -18,7 +18,7 @@ class Mapper {
 
     fun dbModelToEntity(todoItemDbModel: TodoItemDbModel): TodoItem {
         return TodoItem(
-            id = todoItemDbModel.id.toString(),
+            id = todoItemDbModel.id,
             text = todoItemDbModel.text,
             priority = todoItemDbModel.priority,
             isCompleted = todoItemDbModel.isCompleted,

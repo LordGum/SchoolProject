@@ -5,5 +5,5 @@ import com.example.schoolproject.domain.TodoItemsRepository
 class GetTodoItemUseCase (
     private val repository: TodoItemsRepository
 ) {
-    suspend operator fun invoke(id: String) = repository.getTodoItem(id)
+    suspend operator fun invoke(id: Int) = repository.getTodoItem(id)
 }
