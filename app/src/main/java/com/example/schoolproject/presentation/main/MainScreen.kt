@@ -6,7 +6,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DismissDirection
 import androidx.compose.material3.DismissValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -56,7 +56,7 @@ fun MainScreen(
     viewModel: MainViewModel,
     onTodoItemClick: (TodoItem) -> Unit
 ) {
-    val screenState = viewModel.screenState.collectAsState(MainScreenState.Loading)
+    val screenState = viewModel.screenState.collectAsState(MainScreenState.Initial)
     var currentState = screenState.value
     if (currentState is MainScreenState.TodoList) {
         if (currentState.todoList.isEmpty()) currentState = MainScreenState.Initial
@@ -120,8 +120,10 @@ fun MainScreenContent(
             }
         },
         floatingActionButtonPosition = FabPosition.End,
-    )  { _ ->
-        Column {
+    )  {
+        Column (
+            modifier = Modifier.padding(it)
+        ) {
             Title()
             UnderTitle(countDone, onVisibilityIconClick, visibilityState)
             List(list, viewModel, onTodoItemClickListener, visibilityState)
@@ -159,25 +161,33 @@ fun InitialScreen(
             }
         },
         floatingActionButtonPosition = FabPosition.End,
-    )  {paddingValues ->
+    )  { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
             Title()
-            Box(
+            Card(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
-                contentAlignment = Alignment.Center
+                    .padding(top = 8.dp, bottom = 12.dp, start = 8.dp, end = 8.dp),
+                shape = RoundedCornerShape(8.dp),
+                colors = CardDefaults.cardColors(containerColor = AppTheme.colorScheme.backSecondary),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
-                Text(
-                    text = stringResource(R.string.no_notes),
-                    fontSize = 16.sp,
-                    fontFamily = FontFamily.Default,
-                    color = AppTheme.colorScheme.primary
-                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = stringResource(R.string.no_notes),
+                        fontSize = 16.sp,
+                        fontFamily = FontFamily.Default,
+                        color = AppTheme.colorScheme.primary
+                    )
+                }
             }
         }
     }
@@ -249,14 +259,12 @@ fun List(
     visibilityState: Boolean
 ) {
     Card(
-        modifier = Modifier.padding(8.dp,),
-        shape = RoundedCornerShape(8.dp)
+        modifier = Modifier.padding(top = 8.dp, bottom = 12.dp, start = 8.dp, end = 8.dp),
+        shape = RoundedCornerShape(8.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         LazyColumn(
-            modifier = Modifier.fillMaxWidth().background(AppTheme.colorScheme.backSecondary),
-            contentPadding = PaddingValues(
-                bottom = 48.dp
-            )
+            modifier = Modifier.fillMaxWidth().background(AppTheme.colorScheme.backSecondary)
         ) {
             items(items = list, key = { it.id }) { item ->
                 if (!item.isCompleted || visibilityState) {
