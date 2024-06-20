@@ -12,30 +12,36 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.schoolproject.R
+import com.example.schoolproject.domain.entities.TodoItem
 import com.example.schoolproject.ui.theme.AppTheme
 import com.example.schoolproject.ui.theme.Red
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PriorityMenu() {
-    val options = listOf(
-        stringResource(R.string.low_priority),
-        stringResource(R.string.lnormal_priority),
-        stringResource(R.string.high_priority)
+fun PriorityMenu(
+    item: TodoItem,
+    onItemChange: (TodoItem) -> Unit
+) {
+    val options = mapOf(
+        TodoItem.Priority.LOW to stringResource(R.string.low_priority),
+        TodoItem.Priority.NORMAL to stringResource(R.string.lnormal_priority),
+        TodoItem.Priority.HIGH to stringResource(R.string.high_priority),
     )
-    val expanded = remember { mutableStateOf(false) }
-    val text = remember { mutableStateOf(options[1]) }
+
+    val expanded = rememberSaveable { mutableStateOf(false) }
+    val currentPriority = remember { mutableStateOf(item.priority) }
 
     ExposedDropdownMenuBox(
         expanded = expanded.value,
         onExpandedChange = { expanded.value = it }
     ) {
         Text(
-            text = text.value,
+            text = options[currentPriority.value] ?: stringResource(R.string.lnormal_priority),
             modifier = Modifier
                 .menuAnchor()
                 .width(164.dp),
@@ -48,14 +54,15 @@ fun PriorityMenu() {
         ) {
             options.forEach { option ->
                 DropdownMenuItem(
-                    text = { Text(option, style = MaterialTheme.typography.bodyLarge) },
+                    text = { Text(option.value, style = MaterialTheme.typography.bodyLarge) },
                     onClick = {
-                        text.value = option
+                        currentPriority.value = option.key
                         expanded.value = false
+                        onItemChange(item.copy(priority = option.key))
                     },
                     contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
                     colors = MenuDefaults.itemColors(
-                        textColor = if (option != options[2]) AppTheme.colorScheme.primary
+                        textColor = if (option.value != options[TodoItem.Priority.HIGH]) AppTheme.colorScheme.primary
                                     else Red
                     ),
                 )
@@ -63,3 +70,4 @@ fun PriorityMenu() {
         }
     }
 }
+

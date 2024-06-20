@@ -49,7 +49,6 @@ fun DetailScreen(
             DetailScreenContent(
                 onBackClickListener = onBackClickListener,
                 onSaveClickListener = { onSaveClickListener(it) },
-                canDelete = id > 0,
                 item = currentState.item,
                 onDeleteClickListener = {
                     viewModel.deleteTodoItem(id)
@@ -73,10 +72,10 @@ private fun DetailScreenContent(
     onBackClickListener: () -> Unit,
     onSaveClickListener: (TodoItem) -> Unit,
     onDeleteClickListener: () -> Unit,
-    canDelete: Boolean,
     item: TodoItem
 ) {
     val currentItem = rememberSaveable { mutableStateOf(item) }
+    val errorState = rememberSaveable{ mutableStateOf(false) }
     val scrollState = rememberLazyListState()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
@@ -99,7 +98,8 @@ private fun DetailScreenContent(
                 },
                 actions = {
                     TextButton(onClick = {
-                        if (currentItem.value.text.trim().isNotBlank()) onSaveClickListener(item)
+                        if (currentItem.value.text.trim().isNotBlank()) onSaveClickListener(currentItem.value)
+                        else errorState.value = true
                     }) {
                         Text(
                             text = stringResource(R.string.save),
@@ -115,20 +115,25 @@ private fun DetailScreenContent(
                 colors = TopAppBarDefaults.topAppBarColors(AppTheme.colorScheme.backPrimary)
             )
         },
-        content = {
+        content = { paddingValues ->
             Box (
                 modifier = Modifier
-                    .padding(it)
+                    .padding(paddingValues)
                     .fillMaxSize()
                     .background(AppTheme.colorScheme.backPrimary)
             ){
                 Column {
                     DetailComment(
-                        onTextChange = {newText -> currentItem.value.text = newText },
-                        oldText = currentItem.value.text
+                        onItemChange = { newItem ->
+                            currentItem.value = newItem
+                            if (newItem.text.isNotBlank()) errorState.value = false
+                        },
+                        item = currentItem.value,
+                        errorState = errorState.value
                     )
                     DetailColumn(
-                        canDelete = canDelete,
+                        item = item,
+                        onItemChange = { newItem -> currentItem.value = newItem },
                         onDeleteIconClickListener = onDeleteClickListener
                     )
                 }

@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,7 +19,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.Card
 import androidx.compose.material3.DismissDirection
 import androidx.compose.material3.DismissValue
@@ -48,7 +48,6 @@ import com.example.schoolproject.domain.entities.TodoItem
 import com.example.schoolproject.presentation.ui_elements.LoadingScreen
 import com.example.schoolproject.ui.theme.AppTheme
 import com.example.schoolproject.ui.theme.Blue
-import com.example.schoolproject.ui.theme.Green
 import com.example.schoolproject.ui.theme.Red
 import java.util.Date
 
@@ -216,9 +215,7 @@ fun UnderTitle(
 
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(end = 24.dp),
+            modifier = Modifier.fillMaxWidth().padding(end = 24.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
@@ -252,36 +249,34 @@ fun List(
     visibilityState: Boolean
 ) {
     Card(
-        modifier = Modifier.padding(8.dp),
+        modifier = Modifier.padding(8.dp,),
         shape = RoundedCornerShape(8.dp)
     ) {
         LazyColumn(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth().background(AppTheme.colorScheme.backSecondary),
+            contentPadding = PaddingValues(
+                bottom = 48.dp
+            )
         ) {
             items(items = list, key = { it.id }) { item ->
                 if (!item.isCompleted || visibilityState) {
                     val dismissState = rememberDismissState(
                         initialValue = DismissValue.Default
                     )
-                    if (dismissState.isDismissed(DismissDirection.StartToEnd)) {
-                        viewModel.doneTodoItem(item)
-                    }
                     if (dismissState.isDismissed(DismissDirection.EndToStart)) {
                         viewModel.deleteTodoItem(item.id)
                     }
                     SwipeToDismiss(
-                        modifier = Modifier.animateItemPlacement(),
+                        modifier = Modifier.animateItemPlacement().background(Red),
                         state = dismissState,
                         background = {
                             when (dismissState.targetValue) {
-                                DismissValue.DismissedToEnd -> DoneBackground()
                                 DismissValue.DismissedToStart -> DeleteBackground()
-                                DismissValue.Default -> AppTheme.colorScheme.backPrimary
+                                else -> {}
                             }
                         },
                         directions = setOf(
-                            DismissDirection.EndToStart,
-                            DismissDirection.StartToEnd
+                            DismissDirection.EndToStart
                         ),
                         dismissContent = {
                             Item(
@@ -308,23 +303,6 @@ fun DeleteBackground() {
     ) {
         Icon(
             imageVector = Icons.Default.Delete,
-            contentDescription = stringResource(R.string.delete_desc),
-            tint = Color.White
-        )
-    }
-}
-
-@Composable
-fun DoneBackground() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = Green)
-            .padding(horizontal = 16.dp),
-        contentAlignment = Alignment.CenterStart
-    ) {
-        Icon(
-            imageVector = Icons.Default.Done,
             contentDescription = stringResource(R.string.delete_desc),
             tint = Color.White
         )

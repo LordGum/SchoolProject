@@ -14,27 +14,25 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.schoolproject.R
+import com.example.schoolproject.domain.entities.TodoItem
 import com.example.schoolproject.ui.theme.AppTheme
 
 @Composable
 fun DetailComment(
-    onTextChange: (String) -> Unit,
-    oldText: String
+    item: TodoItem,
+    onItemChange: (TodoItem) -> Unit,
+    errorState: Boolean
 ) {
-    val textState = rememberSaveable { mutableStateOf(oldText) }
-    val errorState = rememberSaveable { mutableStateOf(false) }
+    val textState = rememberSaveable { mutableStateOf(item.text) }
 
     TextField(
         value = textState.value,
-        onValueChange = { note ->
-            textState.value = note
-            if (note.trim().isBlank()) errorState.value = true
-            else errorState.value = false
-            onTextChange(note)
+        onValueChange = { newText ->
+            textState.value = newText
+            onItemChange(item.copy(text = newText))
         },
         placeholder = {
             Text(
@@ -50,7 +48,7 @@ fun DetailComment(
             .shadow(4.dp),
         shape = RoundedCornerShape(8.dp),
         minLines = 8,
-        isError = errorState.value,
+        isError = errorState,
         colors = TextFieldDefaults.colors(
             focusedContainerColor = AppTheme.colorScheme.backSecondary,
             unfocusedContainerColor = AppTheme.colorScheme.backSecondary,

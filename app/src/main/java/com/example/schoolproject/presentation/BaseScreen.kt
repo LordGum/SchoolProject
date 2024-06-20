@@ -38,6 +38,7 @@ fun BaseScreen() {
                     navigationState.navHostController.popBackStack()
                 },
                 onSaveClickListener = {
+
                     viewModel.saveTodoItem(it)
                     navigationState.navHostController.popBackStack()
                 }

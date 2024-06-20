@@ -34,38 +34,23 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.schoolproject.R
+import com.example.schoolproject.domain.entities.TodoItem
 import com.example.schoolproject.ui.theme.AppTheme
 import com.example.schoolproject.ui.theme.Blue
 import com.example.schoolproject.ui.theme.Gray
 import com.example.schoolproject.ui.theme.Red
+import java.text.SimpleDateFormat
+import java.util.Date
 
 @Composable
 fun DetailColumn(
-    canDelete: Boolean,
+    item: TodoItem,
+    onItemChange: (TodoItem) -> Unit,
     onDeleteIconClickListener: () -> Unit
 ) {
-    val checkState = rememberSaveable{ mutableStateOf(false) }
+    val currentItem = rememberSaveable { mutableStateOf(item) }
+    val checkState = rememberSaveable{ mutableStateOf(item.deadline != null) }
     val openDialogState = rememberSaveable{ mutableStateOf(false) }
-
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .background(AppTheme.colorScheme.backPrimary)
-        .padding(12.dp, 16.dp, 12.dp, 16.dp),
-        verticalArrangement = Arrangement.Center
-    ) {
-        Item1()
-        Item2(
-            checkState = checkState.value,
-            onOpenDialogChange = {
-                openDialogState.value = it
-            },
-            onCheckStateChange = {
-                checkState.value = it
-            }
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Item3(canDelete = canDelete, onDeleteIconClickListener = onDeleteIconClickListener)
-    }
 
     CalendarMenu(
         openDialog = openDialogState.value,
@@ -74,12 +59,45 @@ fun DetailColumn(
         },
         calendarStateChange = {
             checkState.value = it
+        },
+        onDateChange = { time ->
+            currentItem.value = item.copy(deadline = Date(time))
+            onItemChange(item.copy(deadline = Date(time)))
         }
     )
+
+    Column(modifier = Modifier
+        .fillMaxWidth()
+        .background(AppTheme.colorScheme.backPrimary)
+        .padding(12.dp, 16.dp, 12.dp, 16.dp),
+        verticalArrangement = Arrangement.Center
+    ) {
+        Item1(
+            item = item ,
+            onItemChange = onItemChange
+        )
+        Item2(
+            item = item,
+            checkState = checkState.value,
+            onOpenDialogChange = {
+                openDialogState.value = it
+            },
+            onCheckStateChange = {
+                checkState.value = it
+                if (!it) onItemChange(item.copy(deadline = null))
+                currentItem.value = item.copy(deadline = null)
+            }
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Item3(canDelete = item.text.isNotBlank(), onDeleteIconClickListener = onDeleteIconClickListener)
+    }
 }
 
 @Composable
-private fun Item1() {
+private fun Item1(
+    item: TodoItem,
+    onItemChange: (TodoItem) -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -95,7 +113,10 @@ private fun Item1() {
             fontFamily = FontFamily.Default
         )
         Spacer(modifier = Modifier.height(4.dp))
-        PriorityMenu()
+        PriorityMenu(
+            item = item,
+            onItemChange = onItemChange
+        )
         Spacer(modifier = Modifier.height(8.dp))
         Canvas(modifier = Modifier
             .fillMaxSize()
@@ -119,10 +140,14 @@ private fun DrawScope.itemLine(
 
 @Composable
 private fun Item2(
+    item: TodoItem,
     checkState: Boolean,
     onOpenDialogChange: (Boolean) -> Unit,
     onCheckStateChange: (Boolean) -> Unit
 ) {
+    val date = rememberSaveable { mutableStateOf(item.deadline) }
+    val formatter = SimpleDateFormat("dd MMMM yyyy")
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -136,12 +161,26 @@ private fun Item2(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(
-                text = stringResource(R.string.deadline),
-                color = AppTheme.colorScheme.primary,
-                fontSize = 16.sp,
-                fontFamily = FontFamily.Default
-            )
+            Column(
+                horizontalAlignment = Alignment.Start,
+                verticalArrangement = Arrangement.SpaceAround
+            ) {
+                Text(
+                    text = stringResource(R.string.deadline),
+                    color = AppTheme.colorScheme.primary,
+                    fontSize = 16.sp,
+                    fontFamily = FontFamily.Default
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = if (date.value != null)
+                        formatter.format(date.value ?: throw RuntimeException("date is null"))
+                        else "",
+                    color = Blue,
+                    fontSize = 14.sp,
+                    fontFamily = FontFamily.Default
+                )
+            }
             CustomSwitch(
                 checkState = checkState,
                 onOpenDialogChange = onOpenDialogChange,

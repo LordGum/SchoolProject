@@ -38,6 +38,7 @@ import com.example.schoolproject.ui.theme.AppTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
 
 @Composable
 fun Item(
@@ -78,11 +79,16 @@ fun Item(
                         )
                     )
                     if (item.deadline != null && !checked) {
+                        val text = stringResource(R.string.deadline_date)
+                        val formatter = SimpleDateFormat("dd MMMM yyyy")
+                        val date = formatter.format(item.deadline)
+                        val finalText = String.format(text, date)
+
                         Text(
                             modifier = Modifier
                                 .background(AppTheme.colorScheme.backSecondary)
                                 .fillMaxWidth(),
-                            text = stringResource(R.string.deadline_date),
+                            text = finalText,
                             style = TextStyle(
                                 fontFamily = FontFamily.Default,
                                 fontSize = 16.sp,
