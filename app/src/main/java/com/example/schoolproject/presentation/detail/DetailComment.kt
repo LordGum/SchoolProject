@@ -8,28 +8,33 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.schoolproject.R
 import com.example.schoolproject.ui.theme.AppTheme
 
-@Preview
 @Composable
-fun DetailComment() {
-    val textState = remember { mutableStateOf(TextFieldValue()) }
+fun DetailComment(
+    onTextChange: (String) -> Unit,
+    oldText: String
+) {
+    val textState = rememberSaveable { mutableStateOf(oldText) }
+    val errorState = rememberSaveable { mutableStateOf(false) }
 
     TextField(
         value = textState.value,
-        onValueChange = {it ->
-            textState.value = it
+        onValueChange = { note ->
+            textState.value = note
+            if (note.trim().isBlank()) errorState.value = true
+            else errorState.value = false
+            onTextChange(note)
         },
         placeholder = {
             Text(
@@ -45,6 +50,7 @@ fun DetailComment() {
             .shadow(4.dp),
         shape = RoundedCornerShape(8.dp),
         minLines = 8,
+        isError = errorState.value,
         colors = TextFieldDefaults.colors(
             focusedContainerColor = AppTheme.colorScheme.backSecondary,
             unfocusedContainerColor = AppTheme.colorScheme.backSecondary,

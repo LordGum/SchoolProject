@@ -2,7 +2,7 @@ package com.example.schoolproject.presentation.detail
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
@@ -20,7 +21,7 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -30,16 +31,22 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.schoolproject.R
 import com.example.schoolproject.ui.theme.AppTheme
 import com.example.schoolproject.ui.theme.Blue
 import com.example.schoolproject.ui.theme.Gray
+import com.example.schoolproject.ui.theme.Red
 
 @Composable
-fun DetailColumn() {
+fun DetailColumn(
+    canDelete: Boolean,
+    onDeleteIconClickListener: () -> Unit
+) {
+    val checkState = rememberSaveable{ mutableStateOf(false) }
+    val openDialogState = rememberSaveable{ mutableStateOf(false) }
+
     Column(modifier = Modifier
         .fillMaxWidth()
         .background(AppTheme.colorScheme.backPrimary)
@@ -47,10 +54,28 @@ fun DetailColumn() {
         verticalArrangement = Arrangement.Center
     ) {
         Item1()
-        Item2()
+        Item2(
+            checkState = checkState.value,
+            onOpenDialogChange = {
+                openDialogState.value = it
+            },
+            onCheckStateChange = {
+                checkState.value = it
+            }
+        )
         Spacer(modifier = Modifier.height(16.dp))
-        Item3()
+        Item3(canDelete = canDelete, onDeleteIconClickListener = onDeleteIconClickListener)
     }
+
+    CalendarMenu(
+        openDialog = openDialogState.value,
+        onOpenDialogChange = {
+            openDialogState.value = it
+        },
+        calendarStateChange = {
+            checkState.value = it
+        }
+    )
 }
 
 @Composable
@@ -68,14 +93,10 @@ private fun Item1() {
             color = AppTheme.colorScheme.primary,
             fontSize = 16.sp,
             fontFamily = FontFamily.Default
-
         )
-        Text(
-            text = "NO",
-            color = AppTheme.colorScheme.tertiary,
-            fontSize = 14.sp,
-            fontFamily = FontFamily.Default
-        )
+        Spacer(modifier = Modifier.height(4.dp))
+        PriorityMenu()
+        Spacer(modifier = Modifier.height(8.dp))
         Canvas(modifier = Modifier
             .fillMaxSize()
             .height(1.dp)
@@ -97,7 +118,11 @@ private fun DrawScope.itemLine(
 }
 
 @Composable
-private fun Item2() {
+private fun Item2(
+    checkState: Boolean,
+    onOpenDialogChange: (Boolean) -> Unit,
+    onCheckStateChange: (Boolean) -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -117,7 +142,11 @@ private fun Item2() {
                 fontSize = 16.sp,
                 fontFamily = FontFamily.Default
             )
-            Switch()
+            CustomSwitch(
+                checkState = checkState,
+                onOpenDialogChange = onOpenDialogChange,
+                onCheckStateChange = onCheckStateChange
+            )
         }
 
         Canvas(modifier = Modifier
@@ -130,15 +159,20 @@ private fun Item2() {
 }
 
 @Composable
-fun Switch() {
-    val checked = remember { mutableStateOf(true) }
-
+fun CustomSwitch(
+    checkState: Boolean,
+    onOpenDialogChange: (Boolean) -> Unit,
+    onCheckStateChange: (Boolean) -> Unit
+) {
     Switch(
         modifier = Modifier.semantics { contentDescription = "Add deadline?" },
-        checked = checked.value,
-        onCheckedChange = { checked.value = it },
+        checked = checkState,
+        onCheckedChange = {
+            onOpenDialogChange(it)
+            onCheckStateChange(it)
+        },
         thumbContent = {
-            if (checked.value) {
+            if (checkState) {
                 Icon(
                     imageVector = Icons.Filled.Check,
                     contentDescription = null,
@@ -158,23 +192,29 @@ fun Switch() {
 }
 
 @Composable
-fun Item3() {
+fun Item3(
+    canDelete: Boolean,
+    onDeleteIconClickListener: () -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(20.dp),
+            .height(20.dp)
+            .clickable {
+                if (canDelete) onDeleteIconClickListener()
+            },
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
             imageVector = Icons.Default.Delete,
             contentDescription = stringResource(R.string.delete_button_desc),
-            tint = AppTheme.colorScheme.disable,
+            tint = if (canDelete) Red else AppTheme.colorScheme.disable,
             modifier = Modifier.size(24.dp)
         )
         Text(
             text = stringResource(R.string.delete),
-            color = AppTheme.colorScheme.disable,
+            color = if (canDelete) Red else AppTheme.colorScheme.disable,
             fontSize = 16.sp,
             fontFamily = FontFamily.Default,
         )

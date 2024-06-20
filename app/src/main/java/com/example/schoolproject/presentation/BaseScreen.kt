@@ -34,8 +34,13 @@ fun BaseScreen() {
             DetailScreen(
                 id = id,
                 viewModel = viewModel,
-                onBackClickListener = { /*TODO*/ },
-                onSaveClickListener = {}
+                onBackClickListener = {
+                    navigationState.navHostController.popBackStack()
+                },
+                onSaveClickListener = {
+                    viewModel.saveTodoItem(it)
+                    navigationState.navHostController.popBackStack()
+                }
             )
         }
     )

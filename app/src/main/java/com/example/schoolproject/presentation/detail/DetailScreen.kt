@@ -18,6 +18,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -44,7 +46,16 @@ fun DetailScreen(
 
     when (val currentState = screenState.value) {
         is DetailScreenState.TodoItemState -> {
-            DetailScreenContent()
+            DetailScreenContent(
+                onBackClickListener = onBackClickListener,
+                onSaveClickListener = { onSaveClickListener(it) },
+                canDelete = id > 0,
+                item = currentState.item,
+                onDeleteClickListener = {
+                    viewModel.deleteTodoItem(id)
+                    onBackClickListener()
+                }
+            )
         }
         is DetailScreenState.LoadingState -> {
             LoadingScreen()
@@ -58,9 +69,17 @@ fun DetailScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun DetailScreenContent() {
+private fun DetailScreenContent(
+    onBackClickListener: () -> Unit,
+    onSaveClickListener: (TodoItem) -> Unit,
+    onDeleteClickListener: () -> Unit,
+    canDelete: Boolean,
+    item: TodoItem
+) {
+    val currentItem = rememberSaveable { mutableStateOf(item) }
     val scrollState = rememberLazyListState()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+
     Scaffold(
         modifier = Modifier
             .nestedScroll(scrollBehavior.nestedScrollConnection)
@@ -69,7 +88,9 @@ private fun DetailScreenContent() {
             TopAppBar(
                 title = {},
                 navigationIcon = {
-                    IconButton(onClick = { /* doSomething() */ }) {
+                    IconButton(onClick = {
+                        onBackClickListener()
+                    }) {
                         Icon(
                             imageVector = Icons.Filled.Close,
                             contentDescription = stringResource(R.string.close_description)
@@ -77,7 +98,9 @@ private fun DetailScreenContent() {
                     }
                 },
                 actions = {
-                    TextButton(onClick = { /* doSomething() */ }) {
+                    TextButton(onClick = {
+                        if (currentItem.value.text.trim().isNotBlank()) onSaveClickListener(item)
+                    }) {
                         Text(
                             text = stringResource(R.string.save),
                             fontSize = 14.sp,
@@ -100,8 +123,14 @@ private fun DetailScreenContent() {
                     .background(AppTheme.colorScheme.backPrimary)
             ){
                 Column {
-                    DetailComment()
-                    DetailColumn()
+                    DetailComment(
+                        onTextChange = {newText -> currentItem.value.text = newText },
+                        oldText = currentItem.value.text
+                    )
+                    DetailColumn(
+                        canDelete = canDelete,
+                        onDeleteIconClickListener = onDeleteClickListener
+                    )
                 }
             }
         }

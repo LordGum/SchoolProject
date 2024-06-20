@@ -16,4 +16,10 @@
     <string name="deadline">Сделать до</string>
     <string name="delete_button_desc">delete button</string>
     <string name="delete">Удалить</string>
+    <string name="low_priority">Низкий</string>
+    <string name="lnormal_priority">Обычный</string>
+    <string name="high_priority">Высокий</string>
+    <string name="ok_calendar">Готово</string>
+    <string name="no_calendar">Отмена</string>
+    <string name="chose_date">Выберете дату</string>
 </resources>

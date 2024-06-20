@@ -4,13 +4,19 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import com.example.schoolproject.data.TodoItemsRepositoryImpl
 import com.example.schoolproject.domain.entities.TodoItem
 import com.example.schoolproject.navigation.Screen
 import com.example.schoolproject.presentation.BaseScreen
+import com.example.schoolproject.presentation.detail.CalendarMenu
 import com.example.schoolproject.presentation.detail.DetailColumn
 import com.example.schoolproject.presentation.detail.DetailScreen
 import com.example.schoolproject.presentation.detail.DetailViewModel
+import com.example.schoolproject.presentation.detail.PriorityMenu
 import com.example.schoolproject.presentation.main.MainViewModel
 import com.example.schoolproject.ui.theme.SchoolProjectTheme
 import kotlinx.coroutines.CoroutineScope
@@ -47,20 +53,14 @@ class MainActivity : ComponentActivity() {
         setContent {
             val viewModel = DetailViewModel(application)
             SchoolProjectTheme {
-                DetailScreen(
-                    id = 1,
-                    viewModel = viewModel,
-                    onBackClickListener = {},
-                    onSaveClickListener = {}
-                )
-//                DetailColumn()
-//                BaseScreen()
-//                MainScreen(
-//                    viewModel,
-//                    onTodoItemClick = {
-//                        Log.d("MATAG", "adding new Item")
-//                    }
-//                )
+//                CalendarMenu()
+                BaseScreen()
+//                Box(
+//                    modifier = Modifier.fillMaxSize(),
+//                    contentAlignment = Alignment.Center
+//                ) {
+//                    PriorityMenu()
+//                }
             }
         }
     }
