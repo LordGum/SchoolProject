@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.sp
 import com.example.schoolproject.R
 import com.example.schoolproject.domain.entities.TodoItem
 import com.example.schoolproject.ui.theme.AppTheme
+import com.example.schoolproject.ui.theme.Green
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -126,7 +127,7 @@ fun CustomCheckbox(
                 shape = RoundedCornerShape(3.dp)
             )
             .background(
-                color = if (checked) Color.Green else {
+                color = if (checked) Green else {
                     if (isHigh) Color.Red.copy(alpha = 0.15f)
                     else AppTheme.colorScheme.backSecondary
                 },

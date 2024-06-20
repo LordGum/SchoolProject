@@ -22,6 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.schoolproject.R
+import com.example.schoolproject.domain.entities.TodoItem
 import com.example.schoolproject.ui.theme.AppTheme
 import com.example.schoolproject.ui.theme.Blue
 import com.example.schoolproject.ui.theme.Red
@@ -30,7 +31,8 @@ import java.util.Date
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CalendarMenu(
-    onDateChange: (Long) -> Unit,
+    item: TodoItem,
+    onItemChange: (TodoItem) -> Unit,
     openDialog: Boolean,
     onOpenDialogChange: (Boolean) -> Unit,
     calendarStateChange: (Boolean) -> Unit,
@@ -51,7 +53,8 @@ fun CalendarMenu(
                     if (currentDate < Date().time) {
                         error.value = true
                     } else {
-                        onDateChange(currentDate)
+                        error.value = false
+                        onItemChange(item.copy(deadline = Date(currentDate)))
                         onOpenDialogChange(false)
                         calendarStateChange(true)
                     }

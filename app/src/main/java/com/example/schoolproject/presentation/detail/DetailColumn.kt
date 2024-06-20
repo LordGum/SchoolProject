@@ -28,7 +28,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
@@ -40,7 +39,6 @@ import com.example.schoolproject.ui.theme.Blue
 import com.example.schoolproject.ui.theme.Gray
 import com.example.schoolproject.ui.theme.Red
 import java.text.SimpleDateFormat
-import java.util.Date
 
 @Composable
 fun DetailColumn(
@@ -48,23 +46,7 @@ fun DetailColumn(
     onItemChange: (TodoItem) -> Unit,
     onDeleteIconClickListener: () -> Unit
 ) {
-    val currentItem = rememberSaveable { mutableStateOf(item) }
-    val checkState = rememberSaveable{ mutableStateOf(item.deadline != null) }
-    val openDialogState = rememberSaveable{ mutableStateOf(false) }
 
-    CalendarMenu(
-        openDialog = openDialogState.value,
-        onOpenDialogChange = {
-            openDialogState.value = it
-        },
-        calendarStateChange = {
-            checkState.value = it
-        },
-        onDateChange = { time ->
-            currentItem.value = item.copy(deadline = Date(time))
-            onItemChange(item.copy(deadline = Date(time)))
-        }
-    )
 
     Column(modifier = Modifier
         .fillMaxWidth()
@@ -78,15 +60,7 @@ fun DetailColumn(
         )
         Item2(
             item = item,
-            checkState = checkState.value,
-            onOpenDialogChange = {
-                openDialogState.value = it
-            },
-            onCheckStateChange = {
-                checkState.value = it
-                if (!it) onItemChange(item.copy(deadline = null))
-                currentItem.value = item.copy(deadline = null)
-            }
+            onItemChange = onItemChange
         )
         Spacer(modifier = Modifier.height(16.dp))
         Item3(canDelete = item.text.isNotBlank(), onDeleteIconClickListener = onDeleteIconClickListener)
@@ -141,11 +115,11 @@ private fun DrawScope.itemLine(
 @Composable
 private fun Item2(
     item: TodoItem,
-    checkState: Boolean,
-    onOpenDialogChange: (Boolean) -> Unit,
-    onCheckStateChange: (Boolean) -> Unit
+    onItemChange: (TodoItem) -> Unit
 ) {
-    val date = rememberSaveable { mutableStateOf(item.deadline) }
+    val checkState = rememberSaveable{ mutableStateOf(item.deadline != null) }
+    val openDialogState = rememberSaveable{ mutableStateOf(false) }
+    val currentItem = rememberSaveable { mutableStateOf(item) }
     val formatter = SimpleDateFormat("dd MMMM yyyy")
 
     Column(
@@ -162,6 +136,9 @@ private fun Item2(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column(
+                modifier = Modifier.clickable {
+                    openDialogState.value = true
+                },
                 horizontalAlignment = Alignment.Start,
                 verticalArrangement = Arrangement.SpaceAround
             ) {
@@ -172,19 +149,25 @@ private fun Item2(
                     fontFamily = FontFamily.Default
                 )
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = if (date.value != null)
-                        formatter.format(date.value ?: throw RuntimeException("date is null"))
-                        else "",
-                    color = Blue,
-                    fontSize = 14.sp,
-                    fontFamily = FontFamily.Default
-                )
+                if (currentItem.value.deadline != null) {
+                    Text(
+                        text = formatter.format(currentItem.value.deadline ?: throw RuntimeException("date is null")),
+                        color = Blue,
+                        fontSize = 14.sp,
+                        fontFamily = FontFamily.Default
+                    )
+                }
             }
             CustomSwitch(
-                checkState = checkState,
-                onOpenDialogChange = onOpenDialogChange,
-                onCheckStateChange = onCheckStateChange
+                checkState = checkState.value,
+                onOpenDialogChange = { openDialogState.value = it },
+                onCheckStateChange = {
+                    checkState.value = it
+                    if (!it) {
+                        onItemChange(item.copy(deadline = null))
+                        currentItem.value = item.copy(deadline = null)
+                    }
+                }
             )
         }
 
@@ -195,6 +178,25 @@ private fun Item2(
             itemLine(Gray)
         }
     }
+
+    CalendarMenu(
+        openDialog = openDialogState.value,
+        onOpenDialogChange = {
+            openDialogState.value = it
+        },
+        calendarStateChange = {
+            checkState.value = it
+            if (!it) {
+                onItemChange(item.copy(deadline = null))
+                currentItem.value = item.copy(deadline = null)
+            }
+        },
+        item = item,
+        onItemChange = {
+            currentItem.value = it
+            onItemChange(it)
+        }
+    )
 }
 
 @Composable
@@ -204,7 +206,7 @@ fun CustomSwitch(
     onCheckStateChange: (Boolean) -> Unit
 ) {
     Switch(
-        modifier = Modifier.semantics { contentDescription = "Add deadline?" },
+        modifier = Modifier.semantics {},
         checked = checkState,
         onCheckedChange = {
             onOpenDialogChange(it)

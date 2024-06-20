@@ -132,7 +132,7 @@ private fun DetailScreenContent(
                         errorState = errorState.value
                     )
                     DetailColumn(
-                        item = item,
+                        item = currentItem.value,
                         onItemChange = { newItem -> currentItem.value = newItem },
                         onDeleteIconClickListener = onDeleteClickListener
                     )
