@@ -225,7 +225,9 @@ fun UnderTitle(
 
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(end = 24.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(end = 24.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
@@ -264,7 +266,9 @@ fun List(
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         LazyColumn(
-            modifier = Modifier.fillMaxWidth().background(AppTheme.colorScheme.backSecondary)
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(AppTheme.colorScheme.backSecondary)
         ) {
             items(items = list, key = { it.id }) { item ->
                 if (!item.isCompleted || visibilityState) {
@@ -275,7 +279,9 @@ fun List(
                         viewModel.deleteTodoItem(item.id)
                     }
                     SwipeToDismiss(
-                        modifier = Modifier.animateItemPlacement().background(Red),
+                        modifier = Modifier
+                            .animateItemPlacement()
+                            .background(Red),
                         state = dismissState,
                         background = {
                             when (dismissState.targetValue) {
