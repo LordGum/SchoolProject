@@ -50,4 +50,7 @@ fun SchoolProjectTheme(
 object AppTheme {
     val colorScheme: CustomColorScheme
         @Composable get() = LocalCustomColorScheme.current
+
+    val typography: CustomTypography
+        @Composable get() = LocalCustomTypography.current
 }
