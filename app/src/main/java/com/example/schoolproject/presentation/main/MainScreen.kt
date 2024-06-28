@@ -38,6 +38,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
@@ -45,6 +46,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.schoolproject.R
 import com.example.schoolproject.domain.entities.TodoItem
+import com.example.schoolproject.presentation.main.toolbar.CollapsingTitle
+import com.example.schoolproject.presentation.main.toolbar.CustomToolbar
+import com.example.schoolproject.presentation.main.toolbar.rememberToolbarScrollBehavior
 import com.example.schoolproject.presentation.ui_elements.LoadingScreen
 import com.example.schoolproject.ui.theme.AppTheme
 import com.example.schoolproject.ui.theme.Blue
@@ -84,6 +88,7 @@ fun MainScreen(
         }
     }
 }
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreenContent(
     list: List<TodoItem>,
@@ -93,7 +98,16 @@ fun MainScreenContent(
     onVisibilityIconClick: () -> Unit,
     visibilityState: Boolean
 ) {
+    val scrollBehavior = rememberToolbarScrollBehavior()
     Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
+            CustomToolbar(
+                modifier = Modifier.background(AppTheme.colorScheme.backPrimary),
+                collapsingTitle = CollapsingTitle.large(titleText = "Мои дела"),
+                scrollBehavior = scrollBehavior
+            )
+        },
         containerColor = AppTheme.colorScheme.backPrimary,
         floatingActionButton = {
             FloatingActionButton(
@@ -124,7 +138,6 @@ fun MainScreenContent(
         Column (
             modifier = Modifier.padding(it)
         ) {
-            Title()
             UnderTitle(countDone, onVisibilityIconClick, visibilityState)
             List(list, viewModel, onTodoItemClickListener, visibilityState)
         }
