@@ -12,7 +12,7 @@ fun AppNavGraph(
     navHostController: NavHostController,
     enterScreenContent: @Composable () -> Unit,
     mainScreenContent: @Composable () -> Unit,
-    detailScreenContent: @Composable (Int) -> Unit
+    detailScreenContent: @Composable (String) -> Unit
 ) {
     NavHost(
         navController = navHostController,
@@ -28,11 +28,11 @@ fun AppNavGraph(
             route = Screen.DetailScreen.route,
             arguments = listOf(
                 navArgument(Screen.ID) {
-                    type = NavType.IntType
+                    type = NavType.StringType
                 }
             )
         ) {
-            val id = it.arguments?.getInt(Screen.ID) ?: -1
+            val id = it.arguments?.getString(Screen.ID) ?: "-1"
             detailScreenContent(id)
         }
     }

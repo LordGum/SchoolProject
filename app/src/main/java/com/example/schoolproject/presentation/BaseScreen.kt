@@ -6,7 +6,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModelProvider
 import com.example.schoolproject.navigation.AppNavGraph
 import com.example.schoolproject.navigation.rememberNavigationState
-import com.example.schoolproject.presentation.detail.DetailScreen
+import com.example.schoolproject.presentation.detail.ui.DetailScreen
 import com.example.schoolproject.presentation.detail.DetailViewModel
 import com.example.schoolproject.presentation.main.MainScreen
 import com.example.schoolproject.presentation.main.MainViewModel

@@ -35,7 +35,7 @@ class MainViewModel(
         .onEach { list -> _count.value = list.count{ it.isCompleted } }
         .map { MainScreenState.TodoList(todoList = it, _count.value) as MainScreenState }
 
-    fun deleteTodoItem(id: Int) {
+    fun deleteTodoItem(id: String) {
         viewModelScope.launch(exceptionHandler) {
             deleteTodoItemUseCase(id)
         }

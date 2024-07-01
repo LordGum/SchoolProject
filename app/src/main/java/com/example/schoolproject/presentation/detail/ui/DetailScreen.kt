@@ -1,4 +1,4 @@
-package com.example.schoolproject.presentation.detail
+package com.example.schoolproject.presentation.detail.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -31,6 +31,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.schoolproject.R
 import com.example.schoolproject.domain.entities.TodoItem
+import com.example.schoolproject.presentation.detail.DetailScreenState
+import com.example.schoolproject.presentation.detail.DetailViewModel
 import com.example.schoolproject.presentation.ui_elements.ErrorScreen
 import com.example.schoolproject.presentation.ui_elements.LoadingScreen
 import com.example.schoolproject.ui.theme.AppTheme
@@ -38,7 +40,7 @@ import com.example.schoolproject.ui.theme.Blue
 
 @Composable
 fun DetailScreen(
-    id: Int,
+    id: String,
     viewModel: DetailViewModel,
     onBackClickListener: () -> Unit,
     onSaveClickListener: (TodoItem) -> Unit

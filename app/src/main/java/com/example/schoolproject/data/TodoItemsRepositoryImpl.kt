@@ -2,6 +2,7 @@ package com.example.schoolproject.data
 
 import android.content.Context
 import com.example.schoolproject.data.database.AppDatabase
+import com.example.schoolproject.data.mappers.Mapper
 import com.example.schoolproject.domain.TodoItemsRepository
 import com.example.schoolproject.domain.entities.TodoItem
 import kotlinx.coroutines.flow.Flow
@@ -24,11 +25,11 @@ class TodoItemsRepositoryImpl(
         todoDao.addTodoItem(mapper.entityToDbModel(todoItem))
     }
 
-    override suspend fun deleteTodoItem(id: Int) {
+    override suspend fun deleteTodoItem(id: String) {
         todoDao.deleteTodoItem(id)
     }
 
-    override suspend fun getTodoItem(id: Int): TodoItem {
+    override suspend fun getTodoItem(id: String): TodoItem {
         val dbModel = todoDao.getTodoItemInfo(id)
         return mapper.dbModelToEntity(dbModel)
     }

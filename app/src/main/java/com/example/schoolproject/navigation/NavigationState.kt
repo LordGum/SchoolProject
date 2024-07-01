@@ -18,7 +18,7 @@ class NavigationState(
         }
     }
 
-    fun navigateToDetailScreen(id: Int) {
+    fun navigateToDetailScreen(id: String) {
         navHostController.navigate(Screen.DetailScreen.getArgs(id))
     }
 }

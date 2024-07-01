@@ -7,7 +7,7 @@ sealed class Screen(
     data object MainScreen: Screen(ROUTE_MAIN)
     data object DetailScreen: Screen(ROUTE_DETAIL) {
         private const val ROUTE_FOR_ARGS = "route_detail"
-        fun getArgs(id: Int): String {
+        fun getArgs(id: String): String {
             return "$ROUTE_FOR_ARGS/${id}"
         }
     }

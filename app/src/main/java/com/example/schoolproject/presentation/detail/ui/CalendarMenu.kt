@@ -1,4 +1,4 @@
-package com.example.schoolproject.presentation.detail
+package com.example.schoolproject.presentation.detail.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.padding

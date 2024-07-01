@@ -21,6 +21,7 @@ class DetailViewModel (
 ): AndroidViewModel(application) {
     private val exceptionHandler = CoroutineExceptionHandler { _, _ ->
         Log.d("DetailViewModel", "Exception caught by exception handler")
+        _screenState.value = DetailScreenState.ErrorState
     }
 
     private val repository = TodoItemsRepositoryImpl(application)
@@ -33,22 +34,17 @@ class DetailViewModel (
     private val _screenState = MutableStateFlow<DetailScreenState>(DetailScreenState.LoadingState)
     val screenState: StateFlow<DetailScreenState> = _screenState
 
-    fun getTodoItem(id: Int) {
+    fun getTodoItem(id: String) {
         viewModelScope.launch(exceptionHandler) {
-            try {
-                val item =  if (id > 0 ) getTodoItemUseCase(id) else {
-                    TodoItem(
-                        id = TodoItem.UNDEFINED_ID,
-                        text = "",
-                        priority = TodoItem.Priority.NORMAL,
-                        isCompleted = false,
-                        createdDate = Date()
-                    )
-                }
-                _screenState.value = DetailScreenState.TodoItemState(item)
-            } catch (e: Exception) {
-                _screenState.value = DetailScreenState.ErrorState
+            val item =  if (id != TodoItem.UNDEFINED_ID ) getTodoItemUseCase(id) else {
+                TodoItem(
+                    text = "",
+                    priority = TodoItem.Priority.NORMAL,
+                    isCompleted = false,
+                    createdDate = Date()
+                )
             }
+            _screenState.value = DetailScreenState.TodoItemState(item)
         }
     }
 
@@ -64,7 +60,7 @@ class DetailViewModel (
         }
     }
 
-    fun deleteTodoItem(id: Int) {
+    fun deleteTodoItem(id: String) {
         viewModelScope.launch(exceptionHandler) {
             deleteTodoItemUseCase(id)
         }

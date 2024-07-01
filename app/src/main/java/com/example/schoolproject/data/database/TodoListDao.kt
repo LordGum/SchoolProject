@@ -12,10 +12,10 @@ interface TodoListDao {
     suspend fun addTodoItem(todoItem: TodoItemDbModel)
 
     @Query("DELETE FROM todolist WHERE id = :id")
-    suspend fun deleteTodoItem(id: Int)
+    suspend fun deleteTodoItem(id: String)
 
     @Query("SELECT * FROM todolist WHERE id = :id")
-    suspend fun getTodoItemInfo(id: Int): TodoItemDbModel
+    suspend fun getTodoItemInfo(id: String): TodoItemDbModel
 
     @Query("SELECT * FROM todolist ORDER BY id")
     fun getTodoList(): Flow<List<TodoItemDbModel>>

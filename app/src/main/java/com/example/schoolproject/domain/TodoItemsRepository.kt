@@ -9,9 +9,9 @@ interface TodoItemsRepository  {
 
     suspend fun addTodoItem(todoItem: TodoItem)
 
-    suspend fun deleteTodoItem(id: Int)
+    suspend fun deleteTodoItem(id: String)
 
-    suspend fun getTodoItem(id: Int): TodoItem
+    suspend fun getTodoItem(id: String): TodoItem
 
     suspend fun refactorTodoItem(todoItem: TodoItem)
 }

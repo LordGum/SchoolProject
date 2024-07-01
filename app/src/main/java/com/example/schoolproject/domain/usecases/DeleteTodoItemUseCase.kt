@@ -5,5 +5,5 @@ import com.example.schoolproject.domain.TodoItemsRepository
 class DeleteTodoItemUseCase (
     private val repository: TodoItemsRepository
 ) {
-    suspend operator fun invoke(id: Int) = repository.deleteTodoItem(id)
+    suspend operator fun invoke(id: String) = repository.deleteTodoItem(id)
 }
