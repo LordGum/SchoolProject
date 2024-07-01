@@ -14,8 +14,10 @@ class MainActivity : ComponentActivity() {
         setContent {
             SchoolProjectTheme {
                 BaseScreen()
+//                CustomToolbarDemo()
             }
         }
     }
 }
+
 
