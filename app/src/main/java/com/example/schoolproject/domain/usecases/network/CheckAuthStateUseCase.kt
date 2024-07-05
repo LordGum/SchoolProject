@@ -1,4 +1,4 @@
-package com.example.schoolproject.domain.usecases.login
+package com.example.schoolproject.domain.usecases.network
 
 import com.example.schoolproject.domain.NetworkRepository
 

@@ -1,8 +1,10 @@
 package com.example.schoolproject.data.network
 
+import android.util.Log
 import com.yandex.authsdk.YandexAuthToken
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -14,6 +16,7 @@ object ApiFactory {
 
     fun initialize(token: YandexAuthToken) {
         this.token = token
+        Log.d("tag", "token = ${token.value}")
     }
 
     private val client = OkHttpClient.Builder()
@@ -23,6 +26,9 @@ object ApiFactory {
                 .build()
             chain.proceed(request)
         }
+        .addInterceptor(HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
+        })
         .build()
 
 

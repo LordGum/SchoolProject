@@ -31,10 +31,9 @@ class MainActivity : ComponentActivity() {
             viewModel.performAuthResult()
         }
 
-        val repository = NetworkRepositoryImpl(this.applicationContext, TokenPreferences(applicationContext))
+        val repository = NetworkRepositoryImpl(this.applicationContext)
         CoroutineScope(Dispatchers.Default).launch {
-            val list = repository.getTodoList()
-            Log.d("tag", "newList = ${list.size}")
+//            val response = repository.getTodoList()
         }
 
 
@@ -46,16 +45,22 @@ class MainActivity : ComponentActivity() {
 
                 when (authState.value) {
                     is AuthState.Authorized -> {
+                        Log.d("tag", "auth")
                         val preferences = TokenPreferences(applicationContext)
                         val token = preferences.getToken() ?: throw RuntimeException("token is null")
                         ApiFactory.initialize(token)
                         BaseScreen()
                     }
                     is AuthState.NotAuthorized -> {
+                        Log.d("tag", "not")
                         val loginOptions = YandexAuthLoginOptions()
                         launcher.launch(loginOptions)
                     }
-                    is AuthState.Initial -> {}
+                    is AuthState.Initial -> {
+                        Log.d("tag", "init")
+                    }
+
+                    else -> {}
                 }
             }
         }

@@ -17,7 +17,7 @@ interface TodoListDao {
     @Query("SELECT * FROM todolist WHERE id = :id")
     suspend fun getTodoItemInfo(id: String): TodoItemDbModel
 
-    @Query("SELECT * FROM todolist ORDER BY id")
+    @Query("SELECT * FROM todolist ORDER BY createdDate DESC")
     fun getTodoList(): Flow<List<TodoItemDbModel>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

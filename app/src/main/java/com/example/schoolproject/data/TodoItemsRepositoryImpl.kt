@@ -6,11 +6,14 @@ import androidx.recyclerview.widget.ListUpdateCallback
 import com.example.schoolproject.data.database.AppDatabase
 import com.example.schoolproject.data.database.TodoItemDbModel
 import com.example.schoolproject.data.mappers.MapperDb
+import com.example.schoolproject.data.network.TokenPreferences
 import com.example.schoolproject.data.utils.ListItemDiffCallback
 import com.example.schoolproject.domain.TodoItemsRepository
 import com.example.schoolproject.domain.entities.TodoItem
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -29,8 +32,10 @@ class TodoItemsRepositoryImpl(
         }
     }
 
-    override suspend fun addTodoItem(todoItem: TodoItem) {
-        todoDao.addTodoItem(mapper.entityToDbModel(todoItem))
+    override suspend fun addTodoItem(todoItem: TodoItem): Deferred<Unit> {
+        return scope.async {
+            todoDao.addTodoItem(mapper.entityToDbModel(todoItem))
+        }
     }
 
     override suspend fun deleteTodoItem(id: String) {
