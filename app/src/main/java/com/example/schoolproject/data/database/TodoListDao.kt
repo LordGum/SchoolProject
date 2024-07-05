@@ -19,4 +19,10 @@ interface TodoListDao {
 
     @Query("SELECT * FROM todolist ORDER BY id")
     fun getTodoList(): Flow<List<TodoItemDbModel>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(items: List<TodoItemDbModel>)
+
+    @Query("SELECT * FROM todolist")
+    suspend fun getAllItems(): List<TodoItemDbModel>
 }

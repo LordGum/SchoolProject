@@ -12,7 +12,7 @@ private fun ProjectThemeLight() {
     SchoolProjectTheme(
         darkTheme = false
     ){
-        val todoItem = (TodoItem(1, "Buy groceriesBuy groceriesBuy groceriesBuy groceriesBuy groceriesBuy groceriesBuy groceriesBuy groceriesBuy groceriesBuy groceriesBuy groceriesBuy groceries", TodoItem.Priority.LOW, isCompleted =  false, Date(), null))
+        val todoItem = (TodoItem("1", "Buy groceriesBuy groceriesBuy groceriesBuy groceriesBuy groceriesBuy groceriesBuy groceriesBuy groceriesBuy groceriesBuy groceriesBuy groceriesBuy groceries", TodoItem.Priority.LOW, isCompleted =  false, Date(), null))
         DetailScreenContent(todoItem, isCalendar = false)
     }
 }
@@ -23,7 +23,7 @@ private fun ProjectThemeDark() {
     SchoolProjectTheme(
         darkTheme = true
     ){
-        val todoItem = (TodoItem(1, "Buy groceriesBuy groceriesBuy groceriesBuy groceriesBuy groceriesBuy groceriesBuy groceriesBuy groceriesBuy groceriesBuy groceriesBuy groceriesBuy groceries", TodoItem.Priority.LOW, isCompleted =  false, Date(), null, deadline = Date()))
+        val todoItem = (TodoItem("1", "Buy groceriesBuy groceriesBuy groceriesBuy groceriesBuy groceriesBuy groceriesBuy groceriesBuy groceriesBuy groceriesBuy groceriesBuy groceriesBuy groceries", TodoItem.Priority.LOW, isCompleted =  false, Date(), null, deadline = Date()))
         DetailScreenContent(todoItem, isCalendar = true)
     }
 }
