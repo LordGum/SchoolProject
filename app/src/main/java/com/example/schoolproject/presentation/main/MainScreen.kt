@@ -49,6 +49,7 @@ import com.example.schoolproject.domain.entities.TodoItem
 import com.example.schoolproject.presentation.main.toolbar.CollapsingTitle
 import com.example.schoolproject.presentation.main.toolbar.CustomToolbar
 import com.example.schoolproject.presentation.main.toolbar.rememberToolbarScrollBehavior
+import com.example.schoolproject.presentation.main.ui.NoInternetScreen
 import com.example.schoolproject.presentation.ui_elements.LoadingScreen
 import com.example.schoolproject.ui.theme.AppTheme
 import com.example.schoolproject.ui.theme.Blue
@@ -57,11 +58,12 @@ import com.example.schoolproject.ui.theme.Red
 @Composable
 fun MainScreen(
     viewModel: MainViewModel,
+    isConnectInternet: Boolean,
     onTodoItemClick: (TodoItem) -> Unit,
     onAddButtonClick: () -> Unit
 ) {
     val screenState = viewModel.screenState.collectAsState(MainScreenState.Loading)
-    var currentState = screenState.value
+    var currentState = if (isConnectInternet) screenState.value else MainScreenState.NoInternet
     if (currentState is MainScreenState.TodoList) {
         if (currentState.todoList.isEmpty()) currentState = MainScreenState.Initial
     }
@@ -86,6 +88,9 @@ fun MainScreen(
         }
         is MainScreenState.Initial -> {
             InitialScreen(onAddButtonClick = onAddButtonClick)
+        }
+        is MainScreenState.NoInternet -> {
+            NoInternetScreen()
         }
     }
 }
@@ -322,3 +327,4 @@ fun DeleteBackground() {
         )
     }
 }
+

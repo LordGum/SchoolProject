@@ -4,6 +4,7 @@ import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModelProvider
+import com.example.schoolproject.data.network.ConnectionCheck
 import com.example.schoolproject.domain.entities.TodoItem
 import com.example.schoolproject.navigation.AppNavGraph
 import com.example.schoolproject.navigation.rememberNavigationState
@@ -15,14 +16,16 @@ import com.example.schoolproject.presentation.main.MainViewModel
 @Composable
 fun BaseScreen() {
     val navigationState = rememberNavigationState()
+    val context = LocalContext.current as ComponentActivity
 
     AppNavGraph(
         navHostController = navigationState.navHostController,
         enterScreenContent = {},
         mainScreenContent = {
-            val viewModel: MainViewModel = ViewModelProvider(LocalContext.current as ComponentActivity)[MainViewModel::class]
+            val viewModel: MainViewModel = ViewModelProvider(context)[MainViewModel::class]
             MainScreen(
                 viewModel = viewModel,
+                isConnectInternet = ConnectionCheck(context).isNetworkAvailable(),
                 onTodoItemClick = {
                     navigationState.navigateToDetailScreen(it.id)
                 },
@@ -32,7 +35,7 @@ fun BaseScreen() {
             )
         },
         detailScreenContent = { id ->
-            val viewModel = ViewModelProvider(LocalContext.current as ComponentActivity)[DetailViewModel::class.java]
+            val viewModel = ViewModelProvider(context)[DetailViewModel::class.java]
             DetailScreen(
                 id = id,
                 viewModel = viewModel,

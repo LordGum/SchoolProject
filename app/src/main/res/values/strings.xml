@@ -23,4 +23,5 @@
     <string name="no_calendar">Отмена</string>
     <string name="chose_date">Выберете дату</string>
     <string name="choose_date_cancel">Нельзя выбрать прошедшую дату</string>
+    <string name="no_internet_title">Кажется что то с интернетом, \nпопробуйте позже</string>
 </resources>
