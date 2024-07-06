@@ -12,6 +12,7 @@ import com.example.schoolproject.domain.usecases.database.DeleteTodoItemUseCase
 import com.example.schoolproject.domain.usecases.database.GetTodoItemUseCase
 import com.example.schoolproject.domain.usecases.network.AddTodoNetworkUseCase
 import com.example.schoolproject.domain.usecases.network.DeleteTodoNetworkUseCase
+import com.example.schoolproject.domain.usecases.network.RefactorTodoItemNetworkUseCase
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,21 +38,25 @@ class DetailViewModel (
 
     private val addTodoItemNetworkUseCase = AddTodoNetworkUseCase(repositoryNetwork)
     private val deleteTodoItemNetworkUseCase = DeleteTodoNetworkUseCase(repositoryNetwork)
+    private val refactorTodoItemNetworkUseCase = RefactorTodoItemNetworkUseCase(repositoryNetwork)
 
     private val _screenState = MutableStateFlow<DetailScreenState>(DetailScreenState.LoadingState)
     val screenState: StateFlow<DetailScreenState> = _screenState
 
     fun getTodoItem(id: String) {
         viewModelScope.launch(coroutineContext) {
-            val item =  if (id != TodoItem.UNDEFINED_ID ) getTodoItemUseCase(id) else {
-                TodoItem(
+            if (id != TodoItem.UNDEFINED_ID ) {
+                val item = getTodoItemUseCase(id)
+                _screenState.value = DetailScreenState.RefactorTodoItemState(item)
+            } else {
+                val item = TodoItem(
                     text = "",
                     priority = TodoItem.Priority.NORMAL,
                     isCompleted = false,
                     createdDate = Date()
                 )
+                _screenState.value = DetailScreenState.AddTodoItemState(item)
             }
-            _screenState.value = DetailScreenState.TodoItemState(item)
         }
     }
 
@@ -59,6 +64,13 @@ class DetailViewModel (
         viewModelScope.launch(coroutineContext) {
             addTodoItemUseCase(todoItem).await()
             addTodoItemNetworkUseCase(todoItem)
+        }
+    }
+
+    fun refactorTodoItem(todoItem: TodoItem) {
+        viewModelScope.launch(coroutineContext) {
+            addTodoItemUseCase(todoItem).await()
+            refactorTodoItemNetworkUseCase(todoItem)
         }
     }
 

@@ -43,13 +43,25 @@ fun DetailScreen(
     id: String,
     viewModel: DetailViewModel,
     onBackClickListener: () -> Unit,
-    onSaveClickListener: (TodoItem) -> Unit
+    onSaveClickListener: (TodoItem) -> Unit,
+    onRefactorClickListener: (TodoItem) -> Unit
 ) {
     val screenState = viewModel.screenState.collectAsState(DetailScreenState.LoadingState)
     viewModel.getTodoItem(id)
 
     when (val currentState = screenState.value) {
-        is DetailScreenState.TodoItemState -> {
+        is DetailScreenState.RefactorTodoItemState -> {
+            DetailScreenContent(
+                onBackClickListener = onBackClickListener,
+                onSaveClickListener = { onRefactorClickListener(it) },
+                item = currentState.item,
+                onDeleteClickListener = {
+                    viewModel.deleteTodoItem(id)
+                    onBackClickListener()
+                }
+            )
+        }
+        is DetailScreenState.AddTodoItemState -> {
             DetailScreenContent(
                 onBackClickListener = onBackClickListener,
                 onSaveClickListener = { onSaveClickListener(it) },
@@ -96,6 +108,7 @@ private fun DetailScreenContent(
                     }) {
                         Icon(
                             imageVector = Icons.Filled.Close,
+                            tint = AppTheme.colorScheme.primary,
                             contentDescription = stringResource(R.string.close_description)
                         )
                     }

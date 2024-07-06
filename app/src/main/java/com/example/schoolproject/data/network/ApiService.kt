@@ -7,6 +7,7 @@ import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 
 interface ApiService {
@@ -24,5 +25,12 @@ interface ApiService {
     suspend fun deleteTodoItem (
         @Path("itemId") itemId: String,
         @Header("X-Last-Known-Revision") revision: Int
+    )
+
+    @PUT("list/{itemId}")
+    suspend fun refactorTodoItem (
+        @Path("itemId") itemId: String,
+        @Header("X-Last-Known-Revision") revision: Int,
+        @Body element: ReturnElementDto
     )
 }

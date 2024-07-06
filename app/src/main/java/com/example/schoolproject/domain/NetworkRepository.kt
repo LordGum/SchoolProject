@@ -12,9 +12,11 @@ interface NetworkRepository {
 
     suspend fun checkAuthState()
 
-    suspend fun getTodoList(): Deferred<ResponseListDto>
+    fun getTodoList(): Deferred<ResponseListDto>
 
-    suspend fun deleteTodoItem(id: String)
+    fun deleteTodoItem(id: String)
 
-    suspend fun addTodoItem(todoItem: TodoItem)
+    fun addTodoItem(todoItem: TodoItem)
+
+    fun refactorTodoItem(todoItem: TodoItem)
 }

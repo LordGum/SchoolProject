@@ -1,6 +1,7 @@
 package com.example.schoolproject.data
 
 import android.content.Context
+import android.util.Log
 import com.example.schoolproject.data.mappers.MapperDto
 import com.example.schoolproject.data.network.ApiFactory
 import com.example.schoolproject.data.network.TokenPreferences
@@ -10,6 +11,7 @@ import com.example.schoolproject.data.utils.isValid
 import com.example.schoolproject.domain.NetworkRepository
 import com.example.schoolproject.domain.entities.AuthState
 import com.example.schoolproject.domain.entities.TodoItem
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
@@ -19,6 +21,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 class NetworkRepositoryImpl(
     context: Context
@@ -28,6 +31,9 @@ class NetworkRepositoryImpl(
     private val preferences = TokenPreferences(context)
     private val apiService = ApiFactory.apiService
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
+    private val exceptionHandler = CoroutineExceptionHandler { _, _ ->
+        Log.d("MainViewModel", "Exception caught by exception handler")
+    }
 
     private val token
         get() = preferences.getToken()
@@ -52,21 +58,33 @@ class NetworkRepositoryImpl(
 
     override suspend fun checkAuthState() { checkAuthStateEvents.emit(Unit) }
 
-    override suspend fun getTodoList(): Deferred<ResponseListDto> {
-        return coroutineScope.async {
+    override fun getTodoList(): Deferred<ResponseListDto> {
+        return coroutineScope.async(exceptionHandler) {
             val response = apiService.loadTodoItemList()
             response
         }
     }
 
-    override suspend fun deleteTodoItem(id: String) {
-        val revision = getTodoList().await().revision
-        apiService.deleteTodoItem(id, revision)
+    override fun deleteTodoItem(id: String) {
+        coroutineScope.launch(exceptionHandler) {
+            val revision = getTodoList().await().revision
+            apiService.deleteTodoItem(id, revision)
+        }
     }
 
-    override suspend fun addTodoItem(todoItem: TodoItem) {
-        val revision = getTodoList().await().revision
-        val element =  ReturnElementDto(mapper.mapEntityToElement(todoItem))
-        apiService.addTodoItem(revision, element)
+    override fun addTodoItem(todoItem: TodoItem) {
+        coroutineScope.launch(exceptionHandler) {
+            val revision = getTodoList().await().revision
+            val element =  ReturnElementDto(mapper.mapEntityToElement(todoItem))
+            apiService.addTodoItem(revision, element)
+        }
+    }
+
+    override fun refactorTodoItem(todoItem: TodoItem) {
+        coroutineScope.launch(exceptionHandler) {
+            val revision = getTodoList().await().revision
+            val element =  ReturnElementDto(mapper.mapEntityToElement(todoItem))
+            apiService.refactorTodoItem(todoItem.id, revision, element)
+        }
     }
 }

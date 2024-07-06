@@ -53,12 +53,12 @@ import com.example.schoolproject.presentation.ui_elements.LoadingScreen
 import com.example.schoolproject.ui.theme.AppTheme
 import com.example.schoolproject.ui.theme.Blue
 import com.example.schoolproject.ui.theme.Red
-import java.util.Date
 
 @Composable
 fun MainScreen(
     viewModel: MainViewModel,
-    onTodoItemClick: (TodoItem) -> Unit
+    onTodoItemClick: (TodoItem) -> Unit,
+    onAddButtonClick: () -> Unit
 ) {
     val screenState = viewModel.screenState.collectAsState(MainScreenState.Loading)
     var currentState = screenState.value
@@ -72,6 +72,7 @@ fun MainScreen(
             MainScreenContent(
                 list = currentState.todoList,
                 onTodoItemClickListener = onTodoItemClick,
+                onAddButtonClick = onAddButtonClick,
                 viewModel = viewModel,
                 countDone = currentState.count,
                 onVisibilityIconClick = {
@@ -84,7 +85,7 @@ fun MainScreen(
             LoadingScreen()
         }
         is MainScreenState.Initial -> {
-            InitialScreen(onTodoItemClickListener = onTodoItemClick)
+            InitialScreen(onAddButtonClick = onAddButtonClick)
         }
     }
 }
@@ -93,6 +94,7 @@ fun MainScreen(
 fun MainScreenContent(
     list: List<TodoItem>,
     onTodoItemClickListener: (TodoItem) -> Unit,
+    onAddButtonClick: () -> Unit,
     viewModel: MainViewModel,
     countDone: Int,
     onVisibilityIconClick: () -> Unit,
@@ -112,15 +114,7 @@ fun MainScreenContent(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    onTodoItemClickListener(
-                        TodoItem(
-                            id = TodoItem.UNDEFINED_ID,
-                            text = "",
-                            priority = TodoItem.Priority.NORMAL,
-                            isCompleted = false,
-                            createdDate = Date()
-                        )
-                    )
+                    onAddButtonClick()
                 },
                 shape = CircleShape,
                 elevation = FloatingActionButtonDefaults.elevation(),
@@ -146,21 +140,14 @@ fun MainScreenContent(
 
 @Composable
 fun InitialScreen(
-    onTodoItemClickListener: (TodoItem) -> Unit
+    onAddButtonClick: () -> Unit
 ) {
     Scaffold(
         containerColor = AppTheme.colorScheme.backPrimary,
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    onTodoItemClickListener(TodoItem(
-                        id = TodoItem.UNDEFINED_ID,
-                        text = "",
-                        priority = TodoItem.Priority.NORMAL,
-                            isCompleted = false,
-                            createdDate = Date()
-                        )
-                    )
+                    onAddButtonClick()
                 },
                 shape = CircleShape,
                 elevation = FloatingActionButtonDefaults.elevation(),
