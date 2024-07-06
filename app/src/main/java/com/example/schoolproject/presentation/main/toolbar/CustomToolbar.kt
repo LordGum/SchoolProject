@@ -16,6 +16,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.schoolproject.ui.theme.AppTheme
 import kotlin.math.max
 import kotlin.math.roundToInt
 
@@ -53,6 +54,7 @@ fun CustomToolbar(
                                 scaleY = collapsingTitleScale,
                                 transformOrigin = TransformOrigin(0f, 0f)
                             ),
+                        color = AppTheme.colorScheme.primary,
                         text = collapsingTitle.titleText,
                         style = collapsingTitle.expandedTextStyle
                     )
@@ -65,6 +67,7 @@ fun CustomToolbar(
                                 scaleY = collapsingTitleScale,
                                 transformOrigin = TransformOrigin(0f, 0f)
                             ),
+                        color = AppTheme.colorScheme.primary,
                         text = collapsingTitle.titleText,
                         style = collapsingTitle.expandedTextStyle,
                         maxLines = 1,
