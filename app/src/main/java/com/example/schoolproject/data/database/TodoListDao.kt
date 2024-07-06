@@ -24,5 +24,8 @@ interface TodoListDao {
     suspend fun insertAll(items: List<TodoItemDbModel>)
 
     @Query("SELECT * FROM todolist")
-    suspend fun getAllItems(): List<TodoItemDbModel>
+     fun getAllItems(): List<TodoItemDbModel>
+
+    @Query("DELETE FROM todolist")
+    suspend fun deleteAllItems()
 }

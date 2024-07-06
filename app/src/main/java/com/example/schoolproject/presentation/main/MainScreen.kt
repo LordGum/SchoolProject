@@ -60,7 +60,7 @@ fun MainScreen(
     viewModel: MainViewModel,
     onTodoItemClick: (TodoItem) -> Unit
 ) {
-    val screenState = viewModel.screenState.collectAsState(MainScreenState.Initial)
+    val screenState = viewModel.screenState.collectAsState(MainScreenState.Loading)
     var currentState = screenState.value
     if (currentState is MainScreenState.TodoList) {
         if (currentState.todoList.isEmpty()) currentState = MainScreenState.Initial
@@ -88,7 +88,7 @@ fun MainScreen(
         }
     }
 }
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun MainScreenContent(
     list: List<TodoItem>,

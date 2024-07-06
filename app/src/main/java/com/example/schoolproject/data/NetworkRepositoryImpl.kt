@@ -27,7 +27,6 @@ class NetworkRepositoryImpl(
     private val mapper = MapperDto()
     private val preferences = TokenPreferences(context)
     private val apiService = ApiFactory.apiService
-    private val repositoryDb = TodoItemsRepositoryImpl(context)
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
 
     private val token
@@ -67,7 +66,7 @@ class NetworkRepositoryImpl(
     }
 
     override suspend fun deleteTodoItem(id: String) {
-        TODO("Not yet implemented")
+        apiService.deleteTodoItem(id)
     }
 
     override suspend fun addTodoItem(todoItem: TodoItem) {
