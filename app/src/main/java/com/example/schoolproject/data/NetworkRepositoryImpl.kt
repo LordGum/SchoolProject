@@ -55,14 +55,8 @@ class NetworkRepositoryImpl(
     override suspend fun getTodoList(): Deferred<ResponseListDto> {
         return coroutineScope.async {
             val response = apiService.loadTodoItemList()
-//            val newList = mapper.mapListDtoTodoListDb(response.list)
-//            repositoryDb.updateDatabase(newList)
             response
         }
-    }
-
-    override suspend fun getTodoItem(id: String): TodoItem {
-        TODO("Not yet implemented")
     }
 
     override suspend fun deleteTodoItem(id: String) {
