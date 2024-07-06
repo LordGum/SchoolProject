@@ -60,7 +60,8 @@ class NetworkRepositoryImpl(
     }
 
     override suspend fun deleteTodoItem(id: String) {
-        apiService.deleteTodoItem(id)
+        val revision = getTodoList().await().revision
+        apiService.deleteTodoItem(id, revision)
     }
 
     override suspend fun addTodoItem(todoItem: TodoItem) {

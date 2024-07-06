@@ -15,11 +15,14 @@ interface ApiService {
     suspend fun loadTodoItemList(): ResponseListDto
 
     @POST("list")
-    suspend fun addTodoItem(
+    suspend fun addTodoItem (
         @Header("X-Last-Known-Revision") revision: Int,
         @Body element: ReturnElementDto
     )
 
-    @DELETE("items/{itemId}")
-    suspend fun deleteTodoItem(@Path("itemId") itemId: String)
+    @DELETE("list/{itemId}")
+    suspend fun deleteTodoItem (
+        @Path("itemId") itemId: String,
+        @Header("X-Last-Known-Revision") revision: Int
+    )
 }
