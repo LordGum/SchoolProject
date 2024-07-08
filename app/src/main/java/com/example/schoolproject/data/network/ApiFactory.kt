@@ -1,5 +1,6 @@
 package com.example.schoolproject.data.network
 
+import android.util.Log
 import com.yandex.authsdk.YandexAuthToken
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -15,6 +16,8 @@ object ApiFactory {
 
     fun initialize(token: YandexAuthToken) {
         this.token = token
+        Log.d("tag", "token = ${token.value}")
+        Log.d("tag", "time = ${token.expiresIn}")
     }
 
     private val client = OkHttpClient.Builder()
