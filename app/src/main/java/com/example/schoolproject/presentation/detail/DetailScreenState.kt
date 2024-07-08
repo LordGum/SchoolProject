@@ -8,5 +8,7 @@ sealed class DetailScreenState {
 
     data object ErrorState: DetailScreenState()
 
-    data class TodoItemState(val item: TodoItem): DetailScreenState()
+    data class AddTodoItemState(val item: TodoItem): DetailScreenState()
+
+    data class RefactorTodoItemState(val item: TodoItem): DetailScreenState()
 }

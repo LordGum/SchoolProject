@@ -4,33 +4,38 @@ import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModelProvider
+import com.example.schoolproject.data.network.ConnectionCheck
+import com.example.schoolproject.domain.entities.TodoItem
 import com.example.schoolproject.navigation.AppNavGraph
 import com.example.schoolproject.navigation.rememberNavigationState
-import com.example.schoolproject.presentation.detail.DetailScreen
 import com.example.schoolproject.presentation.detail.DetailViewModel
+import com.example.schoolproject.presentation.detail.ui.DetailScreen
 import com.example.schoolproject.presentation.main.MainScreen
 import com.example.schoolproject.presentation.main.MainViewModel
 
 @Composable
 fun BaseScreen() {
     val navigationState = rememberNavigationState()
+    val context = LocalContext.current as ComponentActivity
 
     AppNavGraph(
         navHostController = navigationState.navHostController,
-        enterScreenContent = {
-
-        },
+        enterScreenContent = {},
         mainScreenContent = {
-            val viewModel: MainViewModel = ViewModelProvider(LocalContext.current as ComponentActivity)[MainViewModel::class]
+            val viewModel: MainViewModel = ViewModelProvider(context)[MainViewModel::class]
             MainScreen(
                 viewModel = viewModel,
+                isConnectInternet = ConnectionCheck(context).isNetworkAvailable(),
                 onTodoItemClick = {
                     navigationState.navigateToDetailScreen(it.id)
+                },
+                onAddButtonClick = {
+                    navigationState.navigateToDetailScreen(TodoItem.UNDEFINED_ID)
                 }
             )
         },
         detailScreenContent = { id ->
-            val viewModel = ViewModelProvider(LocalContext.current as ComponentActivity)[DetailViewModel::class.java]
+            val viewModel = ViewModelProvider(context)[DetailViewModel::class.java]
             DetailScreen(
                 id = id,
                 viewModel = viewModel,
@@ -39,6 +44,10 @@ fun BaseScreen() {
                 },
                 onSaveClickListener = {
                     viewModel.saveTodoItem(it)
+                    navigationState.navHostController.popBackStack()
+                },
+                onRefactorClickListener = {
+                    viewModel.refactorTodoItem(it)
                     navigationState.navHostController.popBackStack()
                 }
             )

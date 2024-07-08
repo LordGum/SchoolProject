@@ -1,9 +1,9 @@
-package com.example.schoolproject.data
+package com.example.schoolproject.data.mappers
 
 import com.example.schoolproject.data.database.TodoItemDbModel
 import com.example.schoolproject.domain.entities.TodoItem
 
-class Mapper {
+class MapperDb {
     fun entityToDbModel(todoItem: TodoItem): TodoItemDbModel {
         return TodoItemDbModel(
             id = todoItem.id,

@@ -1,6 +1,5 @@
 package com.example.schoolproject.ui.theme.detail_screen
 
-import android.icu.util.Calendar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,7 +28,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.schoolproject.R
 import com.example.schoolproject.domain.entities.TodoItem
-import com.example.schoolproject.presentation.detail.DetailComment
 import com.example.schoolproject.ui.theme.AppTheme
 import com.example.schoolproject.ui.theme.Blue
 

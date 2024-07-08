@@ -1,4 +1,4 @@
-package com.example.schoolproject.presentation.detail
+package com.example.schoolproject.presentation.detail.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -31,6 +31,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.schoolproject.R
 import com.example.schoolproject.domain.entities.TodoItem
+import com.example.schoolproject.presentation.detail.DetailScreenState
+import com.example.schoolproject.presentation.detail.DetailViewModel
 import com.example.schoolproject.presentation.ui_elements.ErrorScreen
 import com.example.schoolproject.presentation.ui_elements.LoadingScreen
 import com.example.schoolproject.ui.theme.AppTheme
@@ -38,16 +40,28 @@ import com.example.schoolproject.ui.theme.Blue
 
 @Composable
 fun DetailScreen(
-    id: Int,
+    id: String,
     viewModel: DetailViewModel,
     onBackClickListener: () -> Unit,
-    onSaveClickListener: (TodoItem) -> Unit
+    onSaveClickListener: (TodoItem) -> Unit,
+    onRefactorClickListener: (TodoItem) -> Unit
 ) {
     val screenState = viewModel.screenState.collectAsState(DetailScreenState.LoadingState)
     viewModel.getTodoItem(id)
 
     when (val currentState = screenState.value) {
-        is DetailScreenState.TodoItemState -> {
+        is DetailScreenState.RefactorTodoItemState -> {
+            DetailScreenContent(
+                onBackClickListener = onBackClickListener,
+                onSaveClickListener = { onRefactorClickListener(it) },
+                item = currentState.item,
+                onDeleteClickListener = {
+                    viewModel.deleteTodoItem(id)
+                    onBackClickListener()
+                }
+            )
+        }
+        is DetailScreenState.AddTodoItemState -> {
             DetailScreenContent(
                 onBackClickListener = onBackClickListener,
                 onSaveClickListener = { onSaveClickListener(it) },
@@ -94,6 +108,7 @@ private fun DetailScreenContent(
                     }) {
                         Icon(
                             imageVector = Icons.Filled.Close,
+                            tint = AppTheme.colorScheme.primary,
                             contentDescription = stringResource(R.string.close_description)
                         )
                     }

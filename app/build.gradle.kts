@@ -20,6 +20,9 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        val clientId = property("clientId")?.toString() ?: error("should add clientId in gradle.properties")
+        manifestPlaceholders["YANDEX_CLIENT_ID"] = clientId
     }
 
     buildTypes {
@@ -83,4 +86,23 @@ dependencies {
 
     //navigation
     implementation("androidx.navigation:navigation-compose:2.7.7")
+
+    //okhttp && retrofit2
+    implementation("com.squareup.okhttp3:logging-interceptor:4.9.3")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+
+    //yandex login
+    implementation("com.yandex.android:authsdk:3.1.0")
+
+    //EncryptedSharedPreferences
+    implementation("androidx.security:security-crypto:1.1.0-alpha03")
+
+    //rv
+    implementation("androidx.recyclerview:recyclerview:1.2.1")
+
+
+    //coroutine
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.5.0")
 }
