@@ -19,6 +19,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -39,6 +40,7 @@ import com.example.schoolproject.ui.theme.Blue
 import com.example.schoolproject.ui.theme.Gray
 import com.example.schoolproject.ui.theme.Red
 import java.text.SimpleDateFormat
+import java.util.Locale
 
 @Composable
 fun DetailColumn(
@@ -46,12 +48,10 @@ fun DetailColumn(
     onItemChange: (TodoItem) -> Unit,
     onDeleteIconClickListener: () -> Unit
 ) {
-
-
     Column(modifier = Modifier
         .fillMaxWidth()
         .background(AppTheme.colorScheme.backPrimary)
-        .padding(12.dp, 16.dp, 12.dp, 16.dp),
+        .padding(0.dp, 16.dp, 12.dp, 16.dp),
         verticalArrangement = Arrangement.Center
     ) {
         Item1(
@@ -62,8 +62,10 @@ fun DetailColumn(
             item = item,
             onItemChange = onItemChange
         )
-        Spacer(modifier = Modifier.height(16.dp))
-        Item3(canDelete = item.text.isNotBlank(), onDeleteIconClickListener = onDeleteIconClickListener)
+        Item3(
+            canDelete = item.text.isNotBlank(),
+            onDeleteIconClickListener = onDeleteIconClickListener
+        )
     }
 }
 
@@ -76,7 +78,7 @@ private fun Item1(
         modifier = Modifier
             .fillMaxWidth()
             .height(72.dp)
-            .padding(8.dp),
+            .padding(start = 16.dp, 8.dp),
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.SpaceAround
     ) {
@@ -120,13 +122,13 @@ private fun Item2(
     val checkState = rememberSaveable{ mutableStateOf(item.deadline != null) }
     val openDialogState = rememberSaveable{ mutableStateOf(false) }
     val currentItem = rememberSaveable { mutableStateOf(item) }
-    val formatter = SimpleDateFormat("dd MMMM yyyy")
+    val formatter = SimpleDateFormat("dd MMMM yyyy", Locale.getDefault())
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .height(72.dp)
-            .padding(8.dp),
+            .padding(start = 16.dp, 8.dp),
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.SpaceAround
     ) {
@@ -179,24 +181,23 @@ private fun Item2(
         }
     }
 
-    CalendarMenu(
-        openDialog = openDialogState.value,
-        onOpenDialogChange = {
-            openDialogState.value = it
-        },
-        calendarStateChange = {
-            checkState.value = it
-            if (!it) {
-                onItemChange(item.copy(deadline = null))
-                currentItem.value = item.copy(deadline = null)
+    if (openDialogState.value) {
+        CalendarMenu(
+            onOpenDialogChange = { openDialogState.value = it },
+            calendarStateChange = {
+                checkState.value = it
+                if (!it) {
+                    onItemChange(item.copy(deadline = null))
+                    currentItem.value = item.copy(deadline = null)
+                }
+            },
+            item = item,
+            onItemChange = {
+                currentItem.value = it
+                onItemChange(it)
             }
-        },
-        item = item,
-        onItemChange = {
-            currentItem.value = it
-            onItemChange(it)
-        }
-    )
+        )
+    }
 }
 
 @Composable
@@ -237,15 +238,9 @@ fun Item3(
     canDelete: Boolean,
     onDeleteIconClickListener: () -> Unit
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(20.dp)
-            .clickable {
-                if (canDelete) onDeleteIconClickListener()
-            },
-        horizontalArrangement = Arrangement.Start,
-        verticalAlignment = Alignment.CenterVertically
+    TextButton(
+        onClick = onDeleteIconClickListener,
+        enabled = canDelete
     ) {
         Icon(
             imageVector = Icons.Default.Delete,
@@ -258,6 +253,7 @@ fun Item3(
             color = if (canDelete) Red else AppTheme.colorScheme.disable,
             fontSize = 16.sp,
             fontFamily = FontFamily.Default,
+            style = AppTheme.typography.subhead
         )
     }
 }

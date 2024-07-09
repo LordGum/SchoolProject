@@ -31,7 +31,9 @@ fun BaseScreen() {
                 },
                 onAddButtonClick = {
                     navigationState.navigateToDetailScreen(TodoItem.UNDEFINED_ID)
-                }
+                },
+                onDeleteClick = { viewModel.deleteTodoItem(it) },
+                onDoneClick = { viewModel.doneTodoItem(it) }
             )
         },
         detailScreenContent = { id ->
