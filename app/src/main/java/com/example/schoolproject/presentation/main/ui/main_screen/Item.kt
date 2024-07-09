@@ -1,4 +1,4 @@
-package com.example.schoolproject.presentation.main
+package com.example.schoolproject.presentation.main.ui.main_screen
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -40,11 +40,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
+import java.util.Locale
 
 @Composable
 fun Item(
     item: TodoItem,
-    viewModel: MainViewModel,
+    onDoneClick: (TodoItem) -> Unit,
     onTodoItemClickListener: (TodoItem) -> Unit
 ) {
     val checked = item.isCompleted
@@ -61,7 +62,8 @@ fun Item(
                 .fillMaxWidth()
         ) {
             CustomCheckbox(
-                viewModel = viewModel, item = item
+                onDoneClick = onDoneClick,
+                item = item
             )
             Spacer(modifier = Modifier.width(12.dp))
             Box(modifier = Modifier.weight(10f)) {
@@ -81,7 +83,7 @@ fun Item(
                     )
                     if (item.deadline != null && !checked) {
                         val text = stringResource(R.string.deadline_date)
-                        val formatter = SimpleDateFormat("dd MMMM yyyy")
+                        val formatter = SimpleDateFormat("dd MMMM yyyy", Locale.getDefault())
                         val date = formatter.format(item.deadline)
                         val finalText = String.format(text, date)
 
@@ -111,7 +113,7 @@ fun Item(
 
 @Composable
 fun CustomCheckbox(
-    viewModel: MainViewModel,
+    onDoneClick: (TodoItem) -> Unit,
     item: TodoItem
 ) {
     val checked = item.isCompleted
@@ -136,7 +138,7 @@ fun CustomCheckbox(
             .alpha(15f)
             .clickable {
                 CoroutineScope(Dispatchers.IO).launch {
-                    viewModel.doneTodoItem(item)
+                    onDoneClick(item)
                 }
             }
     ) {
@@ -151,5 +153,4 @@ fun CustomCheckbox(
             )
         }
     }
-
 }

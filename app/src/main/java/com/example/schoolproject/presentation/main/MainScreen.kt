@@ -6,8 +6,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import com.example.schoolproject.domain.entities.TodoItem
 import com.example.schoolproject.presentation.main.ui.InitialScreen
-import com.example.schoolproject.presentation.main.ui.main_screen.MainScreenContent
 import com.example.schoolproject.presentation.main.ui.NoInternetScreen
+import com.example.schoolproject.presentation.main.ui.main_screen.MainScreenContent
 import com.example.schoolproject.presentation.ui_elements.LoadingScreen
 
 @Composable
@@ -15,7 +15,9 @@ fun MainScreen(
     viewModel: MainViewModel,
     isConnectInternet: Boolean,
     onTodoItemClick: (TodoItem) -> Unit,
-    onAddButtonClick: () -> Unit
+    onAddButtonClick: () -> Unit,
+    onDeleteClick: (String) -> Unit,
+    onDoneClick: (TodoItem) -> Unit,
 ) {
     val screenState = viewModel.screenState.collectAsState(MainScreenState.Loading)
     var currentState = if (isConnectInternet) screenState.value else MainScreenState.NoInternet
@@ -28,14 +30,15 @@ fun MainScreen(
         is MainScreenState.TodoList -> {
             MainScreenContent(
                 list = currentState.todoList,
-                onTodoItemClickListener = onTodoItemClick,
+                onTodoItemClick = onTodoItemClick,
                 onAddButtonClick = onAddButtonClick,
-                viewModel = viewModel,
+                onDoneClick = onDoneClick,
+                onDeleteClick = onDeleteClick,
                 countDone = currentState.count,
                 onVisibilityIconClick = {
                     visibilityState.value = !visibilityState.value
                 },
-                visibilityState.value
+                visibilityState = visibilityState.value
             )
         }
         is MainScreenState.Loading -> {

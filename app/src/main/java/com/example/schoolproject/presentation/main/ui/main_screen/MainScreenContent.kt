@@ -22,19 +22,24 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import com.example.schoolproject.domain.entities.TodoItem
-import com.example.schoolproject.presentation.main.MainViewModel
+import com.example.schoolproject.presentation.ui_elements.PreviewData
 import com.example.schoolproject.ui.theme.AppTheme
+import com.example.schoolproject.ui.theme.AppThemePreview
 import com.example.schoolproject.ui.theme.Blue
+import com.example.schoolproject.ui.theme.SchoolProjectTheme
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreenContent(
     list: List<TodoItem>,
-    onTodoItemClickListener: (TodoItem) -> Unit,
+    onTodoItemClick: (TodoItem) -> Unit,
     onAddButtonClick: () -> Unit,
-    viewModel: MainViewModel,
+    onDeleteClick: (String) -> Unit,
+    onDoneClick: (TodoItem) -> Unit,
     countDone: Int,
     onVisibilityIconClick: () -> Unit,
     visibilityState: Boolean
@@ -77,8 +82,34 @@ fun MainScreenContent(
         },
         floatingActionButtonPosition = FabPosition.End,
     )  {
-        Column (modifier = Modifier.padding(it)) {
-            List(list, viewModel, onTodoItemClickListener, visibilityState)
+
+        Column(modifier = Modifier.padding(it)) {
+            List(
+                list = list,
+                onDeleteClick = onDeleteClick,
+                onDoneClick = onDoneClick,
+                onTodoItemClick = onTodoItemClick,
+                visibilityState = visibilityState
+            )
         }
+    }
+}
+
+@Preview(showBackground = true, widthDp = 360, heightDp = 640, locale = "ru")
+@Composable
+fun PreviewMainScreen(
+    @PreviewParameter(AppThemePreview::class) isDarkTheme: Boolean
+) {
+    SchoolProjectTheme(isDarkTheme) {
+        MainScreenContent(
+            list = PreviewData.getPreviewData(),
+            onTodoItemClick = {},
+            onAddButtonClick = {},
+            onDoneClick = {},
+            onDeleteClick = {},
+            onVisibilityIconClick = {},
+            visibilityState = true,
+            countDone = 111
+        )
     }
 }

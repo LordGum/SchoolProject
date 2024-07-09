@@ -1,5 +1,6 @@
 package com.example.schoolproject.presentation.main.ui.main_screen
 
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -9,26 +10,19 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DismissDirection
-import androidx.compose.material3.DismissValue
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.SwipeToDismiss
-import androidx.compose.material3.rememberDismissState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.schoolproject.domain.entities.TodoItem
-import com.example.schoolproject.presentation.main.Item
-import com.example.schoolproject.presentation.main.MainViewModel
 import com.example.schoolproject.ui.theme.AppTheme
-import com.example.schoolproject.ui.theme.Red
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun List(
     list: List<TodoItem>,
-    viewModel: MainViewModel,
-    onTodoItemClickListener: (TodoItem) -> Unit,
+    onDeleteClick: (String) -> Unit,
+    onDoneClick: (TodoItem) -> Unit,
+    onTodoItemClick: (TodoItem) -> Unit,
     visibilityState: Boolean
 ) {
     Card(
@@ -43,33 +37,14 @@ fun List(
         ) {
             items(items = list, key = { it.id }) { item ->
                 if (!item.isCompleted || visibilityState) {
-                    val dismissState = rememberDismissState(
-                        initialValue = DismissValue.Default
-                    )
-                    if (dismissState.isDismissed(DismissDirection.EndToStart)) {
-                        viewModel.deleteTodoItem(item.id)
-                    }
-                    SwipeToDismiss(
-                        modifier = Modifier
-                            .animateItemPlacement()
-                            .background(Red),
-                        state = dismissState,
-                        background = {
-                            when (dismissState.targetValue) {
-                                DismissValue.DismissedToStart -> DeleteBackground()
-                                else -> {}
-                            }
-                        },
-                        directions = setOf(
-                            DismissDirection.EndToStart
+                    SwipedTodoListItem(
+                        item = item,
+                        onTodoItemClickListener = onTodoItemClick,
+                        onDeleteSwipe = { onDeleteClick(item.id) },
+                        modifier = Modifier.animateItemPlacement(
+                            animationSpec = tween(durationMillis = 0)
                         ),
-                        dismissContent = {
-                            Item(
-                                item = item,
-                                viewModel = viewModel,
-                                onTodoItemClickListener = onTodoItemClickListener
-                            )
-                        }
+                        onDoneClick = onDoneClick
                     )
                 }
             }
