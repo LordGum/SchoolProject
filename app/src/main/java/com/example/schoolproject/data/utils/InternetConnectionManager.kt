@@ -3,7 +3,6 @@ package com.example.schoolproject.data.utils
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
-import android.util.Log
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ExistingWorkPolicy
@@ -48,7 +47,6 @@ class InternetConnectionManager (
             ExistingWorkPolicy.KEEP,
             request
         )
-        Log.d("tag", "refresh")
     }
 
     fun refreshIn8hours() {
@@ -67,12 +65,10 @@ class InternetConnectionManager (
     private fun checkNetworkConnection() {
         connectivityManager.registerDefaultNetworkCallback(object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
-                Log.d("tag", "internet ")
                 _internetState.update { true }
                 refreshOneTime()
             }
             override fun onLost(network: Network) {
-                Log.d("tag", "no internet ")
                 _internetState.update { false }
             }
         })

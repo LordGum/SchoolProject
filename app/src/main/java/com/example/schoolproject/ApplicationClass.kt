@@ -10,16 +10,18 @@ import com.example.schoolproject.data.network.TokenPreferences
 import com.example.schoolproject.data.utils.InternetConnectionManager
 import com.yandex.authsdk.YandexAuthToken
 
-class ApplicationClass: Application(), Configuration.Provider  {
+class ApplicationClass: Application()  {
 
     override fun onCreate() {
         super.onCreate()
-        WorkManager.initialize(this, Configuration.Builder().build())
+
+        val configuration = Configuration.Builder().build()
+        WorkManager.initialize(this, configuration)
 
         val connectionManager by lazy {
             InternetConnectionManager(
                 connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager,
-                workManager = WorkManager.getInstance(applicationContext)
+                workManager = WorkManager.getInstance(this)
             )
         }
 
@@ -29,9 +31,5 @@ class ApplicationClass: Application(), Configuration.Provider  {
             ApiFactory.initialize(token)
             connectionManager.refreshIn8hours()
         }
-    }
-
-    override fun getWorkManagerConfiguration(): Configuration {
-        return Configuration.Builder().build()
     }
 }
