@@ -19,4 +19,6 @@ interface NetworkRepository {
     fun addTodoItem(todoItem: TodoItem)
 
     fun refactorTodoItem(todoItem: TodoItem)
+
+    fun refreshTodoItemList(list: List<TodoItem>): Deferred<ResponseListDto>
 }

@@ -9,6 +9,7 @@ import com.example.schoolproject.presentation.main.ui.InitialScreen
 import com.example.schoolproject.presentation.main.ui.NoInternetScreen
 import com.example.schoolproject.presentation.main.ui.main_screen.MainScreenContent
 import com.example.schoolproject.presentation.ui_elements.LoadingScreen
+import kotlinx.coroutines.Deferred
 
 @Composable
 fun MainScreen(
@@ -18,9 +19,11 @@ fun MainScreen(
     onAddButtonClick: () -> Unit,
     onDeleteClick: (String) -> Unit,
     onDoneClick: (TodoItem) -> Unit,
+    onRefreshTodoList: () -> Deferred<Unit>
 ) {
     val screenState = viewModel.screenState.collectAsState(MainScreenState.Loading)
-    var currentState = if (isConnectInternet) screenState.value else MainScreenState.NoInternet
+    var currentState = screenState.value
+//    var currentState = if (isConnectInternet) screenState.value else MainScreenState.NoInternet
     if (currentState is MainScreenState.TodoList) {
         if (currentState.todoList.isEmpty()) currentState = MainScreenState.Initial
     }
@@ -35,10 +38,9 @@ fun MainScreen(
                 onDoneClick = onDoneClick,
                 onDeleteClick = onDeleteClick,
                 countDone = currentState.count,
-                onVisibilityIconClick = {
-                    visibilityState.value = !visibilityState.value
-                },
-                visibilityState = visibilityState.value
+                onVisibilityIconClick = { visibilityState.value = !visibilityState.value },
+                visibilityState = visibilityState.value,
+                onRefreshTodoList = { onRefreshTodoList() }
             )
         }
         is MainScreenState.Loading -> {

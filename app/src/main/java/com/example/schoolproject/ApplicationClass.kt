@@ -6,7 +6,7 @@ import com.example.schoolproject.data.TodoItemsRepositoryImpl
 import com.example.schoolproject.data.network.ApiFactory
 import com.example.schoolproject.data.network.ConnectionCheck
 import com.example.schoolproject.data.network.TokenPreferences
-import com.example.schoolproject.domain.SyncInteractor
+import com.example.schoolproject.data.SyncInteractor
 import com.yandex.authsdk.YandexAuthToken
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

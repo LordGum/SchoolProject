@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.schoolproject.data.NetworkRepositoryImpl
+import com.example.schoolproject.data.SyncInteractor
 import com.example.schoolproject.data.TodoItemsRepositoryImpl
 import com.example.schoolproject.domain.entities.TodoItem
 import com.example.schoolproject.domain.usecases.database.DeleteTodoItemUseCase
@@ -13,7 +14,9 @@ import com.example.schoolproject.domain.usecases.database.RefactorTodoItemUseCas
 import com.example.schoolproject.domain.usecases.network.DeleteTodoNetworkUseCase
 import com.example.schoolproject.domain.usecases.network.RefactorTodoItemNetworkUseCase
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -25,6 +28,8 @@ class MainViewModel(
 
     private val repository = TodoItemsRepositoryImpl(application)
     private val repositoryNetwork = NetworkRepositoryImpl(application)
+
+    private val syncInteractor = SyncInteractor(repository, repositoryNetwork)
 
     private val getTodoListUseCase = GetTodoListUseCase(repository)
     private val deleteTodoItemUseCase = DeleteTodoItemUseCase(repository)
@@ -55,6 +60,12 @@ class MainViewModel(
         viewModelScope.launch(coroutineContext) {
             refactorTodoItemUseCase(todoItem.copy(isCompleted = !todoItem.isCompleted))
             refactorTodoItemNetworkUseCase(todoItem.copy(isCompleted = !todoItem.isCompleted))
+        }
+    }
+
+    fun refreshTodoList(): Deferred<Unit> {
+        return viewModelScope.async(coroutineContext) {
+            syncInteractor.syncTasks()
         }
     }
 }

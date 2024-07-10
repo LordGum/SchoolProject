@@ -35,7 +35,10 @@ import com.example.schoolproject.ui.theme.AppTheme
 import com.example.schoolproject.ui.theme.AppThemePreview
 import com.example.schoolproject.ui.theme.Blue
 import com.example.schoolproject.ui.theme.SchoolProjectTheme
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -48,10 +51,13 @@ fun MainScreenContent(
     onDoneClick: (TodoItem) -> Unit,
     countDone: Int,
     onVisibilityIconClick: () -> Unit,
-    visibilityState: Boolean
+    visibilityState: Boolean,
+    onRefreshTodoList: () -> Deferred<Unit>
 ) {
-    val pullToRefreshState = rememberPullToRefreshState()
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
+    val pullToRefreshState = rememberPullToRefreshState(
+        enabled = { scrollBehavior.state.collapsedFraction == 0f }
+    )
     val listState = rememberLazyListState()
     val isTopScroll = remember { derivedStateOf { listState.firstVisibleItemIndex == 0 } }
     val scroll = remember { mutableStateOf(false) }
@@ -80,7 +86,7 @@ fun MainScreenContent(
                     LaunchedEffect(true) {
                         scope.launch {
                             pullToRefreshState.startRefresh()
-                            delay(3000) // TODO: work с API
+                            onRefreshTodoList().await()
                             pullToRefreshState.endRefresh()
                         }
                     }
@@ -142,7 +148,8 @@ fun PreviewMainScreen(
             onDeleteClick = {},
             onVisibilityIconClick = {},
             visibilityState = true,
-            countDone = 111
+            countDone = 111,
+            onRefreshTodoList = { CoroutineScope(Dispatchers.Main).async {  } }
         )
     }
 }

@@ -7,6 +7,7 @@ import com.example.schoolproject.data.network.ApiFactory
 import com.example.schoolproject.data.network.TokenPreferences
 import com.example.schoolproject.data.network.model.ResponseListDto
 import com.example.schoolproject.data.network.model.ReturnElementDto
+import com.example.schoolproject.data.network.model.ReturnElementListDto
 import com.example.schoolproject.data.utils.isValid
 import com.example.schoolproject.domain.NetworkRepository
 import com.example.schoolproject.domain.entities.AuthState
@@ -60,8 +61,7 @@ class NetworkRepositoryImpl(
 
     override fun getTodoList(): Deferred<ResponseListDto> {
         return coroutineScope.async(exceptionHandler) {
-            val response = apiService.loadTodoItemList()
-            response
+            apiService.loadTodoItemList()
         }
     }
 
@@ -85,6 +85,14 @@ class NetworkRepositoryImpl(
             val revision = getTodoList().await().revision
             val element =  ReturnElementDto(mapper.mapEntityToElement(todoItem))
             apiService.refactorTodoItem(todoItem.id, revision, element)
+        }
+    }
+
+    override fun refreshTodoItemList(list: List<TodoItem>): Deferred<ResponseListDto>  {
+        return coroutineScope.async(exceptionHandler) {
+            val revision = getTodoList().await().revision
+            val returnList = ReturnElementListDto( list.map { mapper.mapEntityToElement(it) } )
+            apiService.updateTodoItemListOnService(revision, returnList)
         }
     }
 }
