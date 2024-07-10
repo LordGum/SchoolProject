@@ -3,7 +3,7 @@ package com.example.schoolproject.data
 import android.content.Context
 import com.example.schoolproject.data.database.AppDatabase
 import com.example.schoolproject.data.database.TodoItemDbModel
-import com.example.schoolproject.data.mappers.MapperDb
+import com.example.schoolproject.data.utils.mappers.MapperDb
 import com.example.schoolproject.domain.TodoItemsRepository
 import com.example.schoolproject.domain.entities.TodoItem
 import kotlinx.coroutines.CoroutineScope

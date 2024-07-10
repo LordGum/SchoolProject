@@ -2,7 +2,7 @@ package com.example.schoolproject.data
 
 import android.content.Context
 import android.util.Log
-import com.example.schoolproject.data.mappers.MapperDto
+import com.example.schoolproject.data.utils.mappers.MapperDto
 import com.example.schoolproject.data.network.ApiFactory
 import com.example.schoolproject.data.network.TokenPreferences
 import com.example.schoolproject.data.network.model.ResponseListDto

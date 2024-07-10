@@ -1,12 +1,16 @@
 package com.example.schoolproject.presentation.main
 
 import android.app.Application
+import android.content.Context
+import android.net.ConnectivityManager
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.WorkManager
 import com.example.schoolproject.data.NetworkRepositoryImpl
-import com.example.schoolproject.data.SyncInteractor
 import com.example.schoolproject.data.TodoItemsRepositoryImpl
+import com.example.schoolproject.data.utils.InternetConnectionManager
+import com.example.schoolproject.data.utils.SyncInteractor
 import com.example.schoolproject.domain.entities.TodoItem
 import com.example.schoolproject.domain.usecases.database.DeleteTodoItemUseCase
 import com.example.schoolproject.domain.usecases.database.GetTodoListUseCase
@@ -23,13 +27,19 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 class MainViewModel(
-    application: Application
+    private val application: Application
 ): AndroidViewModel(application) {
 
     private val repository = TodoItemsRepositoryImpl(application)
     private val repositoryNetwork = NetworkRepositoryImpl(application)
 
-    private val syncInteractor = SyncInteractor(repository, repositoryNetwork)
+    private val syncInteract = SyncInteractor(repository, repositoryNetwork)
+    private val connectionManager by lazy {
+        InternetConnectionManager(
+            connectivityManager = application.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager,
+            workManager = WorkManager.getInstance(application)
+        )
+    }
 
     private val getTodoListUseCase = GetTodoListUseCase(repository)
     private val deleteTodoItemUseCase = DeleteTodoItemUseCase(repository)
@@ -44,6 +54,8 @@ class MainViewModel(
         Log.d("MainViewModel", "Exception caught by exception handler")
     }
     private val coroutineContext = Dispatchers.IO + exceptionHandler
+
+    val internetState = connectionManager.internetState.value
 
     val screenState = getTodoListUseCase()
         .onEach { list -> _count.value = list.count{ it.isCompleted } }
@@ -65,7 +77,9 @@ class MainViewModel(
 
     fun refreshTodoList(): Deferred<Unit> {
         return viewModelScope.async(coroutineContext) {
-            syncInteractor.syncTasks()
+            if (internetState) {
+                syncInteract.syncTasks()
+            }
         }
     }
 }

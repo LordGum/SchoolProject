@@ -1,4 +1,4 @@
-package com.example.schoolproject.data.mappers
+package com.example.schoolproject.data.utils.mappers
 
 import com.example.schoolproject.data.network.model.ElementDto
 import com.example.schoolproject.data.network.model.ImportanceDto

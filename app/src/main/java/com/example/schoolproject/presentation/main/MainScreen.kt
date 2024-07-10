@@ -6,7 +6,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import com.example.schoolproject.domain.entities.TodoItem
 import com.example.schoolproject.presentation.main.ui.InitialScreen
-import com.example.schoolproject.presentation.main.ui.NoInternetScreen
 import com.example.schoolproject.presentation.main.ui.main_screen.MainScreenContent
 import com.example.schoolproject.presentation.ui_elements.LoadingScreen
 import kotlinx.coroutines.Deferred
@@ -14,16 +13,15 @@ import kotlinx.coroutines.Deferred
 @Composable
 fun MainScreen(
     viewModel: MainViewModel,
-    isConnectInternet: Boolean,
     onTodoItemClick: (TodoItem) -> Unit,
     onAddButtonClick: () -> Unit,
     onDeleteClick: (String) -> Unit,
     onDoneClick: (TodoItem) -> Unit,
-    onRefreshTodoList: () -> Deferred<Unit>
+    onRefreshTodoList: () -> Deferred<Unit>,
+    internetState: Boolean
 ) {
     val screenState = viewModel.screenState.collectAsState(MainScreenState.Loading)
     var currentState = screenState.value
-//    var currentState = if (isConnectInternet) screenState.value else MainScreenState.NoInternet
     if (currentState is MainScreenState.TodoList) {
         if (currentState.todoList.isEmpty()) currentState = MainScreenState.Initial
     }
@@ -40,7 +38,8 @@ fun MainScreen(
                 countDone = currentState.count,
                 onVisibilityIconClick = { visibilityState.value = !visibilityState.value },
                 visibilityState = visibilityState.value,
-                onRefreshTodoList = { onRefreshTodoList() }
+                onRefreshTodoList = { onRefreshTodoList() },
+                internetState = internetState
             )
         }
         is MainScreenState.Loading -> {
@@ -48,9 +47,6 @@ fun MainScreen(
         }
         is MainScreenState.Initial -> {
             InitialScreen(onAddButtonClick = onAddButtonClick)
-        }
-        is MainScreenState.NoInternet -> {
-            NoInternetScreen()
         }
     }
 }

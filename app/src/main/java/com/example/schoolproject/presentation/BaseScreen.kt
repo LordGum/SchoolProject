@@ -4,7 +4,6 @@ import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModelProvider
-import com.example.schoolproject.data.network.ConnectionCheck
 import com.example.schoolproject.domain.entities.TodoItem
 import com.example.schoolproject.navigation.AppNavGraph
 import com.example.schoolproject.navigation.rememberNavigationState
@@ -25,7 +24,6 @@ fun BaseScreen() {
             val viewModel: MainViewModel = ViewModelProvider(context)[MainViewModel::class]
             MainScreen(
                 viewModel = viewModel,
-                isConnectInternet = ConnectionCheck(context).isNetworkAvailable(),
                 onTodoItemClick = {
                     navigationState.navigateToDetailScreen(it.id)
                 },
@@ -34,7 +32,8 @@ fun BaseScreen() {
                 },
                 onDeleteClick = { viewModel.deleteTodoItem(it) },
                 onDoneClick = { viewModel.doneTodoItem(it) },
-                onRefreshTodoList = { viewModel.refreshTodoList() }
+                onRefreshTodoList = { viewModel.refreshTodoList() },
+                internetState = viewModel.internetState
             )
         },
         detailScreenContent = { id ->

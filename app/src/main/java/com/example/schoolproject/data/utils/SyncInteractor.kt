@@ -1,7 +1,7 @@
-package com.example.schoolproject.data
+package com.example.schoolproject.data.utils
 
-import com.example.schoolproject.data.mappers.MapperDb
-import com.example.schoolproject.data.mappers.MapperDto
+import com.example.schoolproject.data.utils.mappers.MapperDb
+import com.example.schoolproject.data.utils.mappers.MapperDto
 import com.example.schoolproject.data.network.model.ElementDto
 import com.example.schoolproject.domain.NetworkRepository
 import com.example.schoolproject.domain.TodoItemsRepository

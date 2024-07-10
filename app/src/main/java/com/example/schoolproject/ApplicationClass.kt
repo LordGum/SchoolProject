@@ -1,33 +1,37 @@
 package com.example.schoolproject
 
 import android.app.Application
-import com.example.schoolproject.data.NetworkRepositoryImpl
-import com.example.schoolproject.data.TodoItemsRepositoryImpl
+import android.content.Context
+import android.net.ConnectivityManager
+import androidx.work.Configuration
+import androidx.work.WorkManager
 import com.example.schoolproject.data.network.ApiFactory
-import com.example.schoolproject.data.network.ConnectionCheck
 import com.example.schoolproject.data.network.TokenPreferences
-import com.example.schoolproject.data.SyncInteractor
+import com.example.schoolproject.data.utils.InternetConnectionManager
 import com.yandex.authsdk.YandexAuthToken
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
-class ApplicationClass: Application() {
+class ApplicationClass: Application(), Configuration.Provider  {
+
     override fun onCreate() {
         super.onCreate()
+        WorkManager.initialize(this, Configuration.Builder().build())
 
-        if( ConnectionCheck(applicationContext).isNetworkAvailable() ) {
+        val connectionManager by lazy {
+            InternetConnectionManager(
+                connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager,
+                workManager = WorkManager.getInstance(applicationContext)
+            )
+        }
+
+        if(connectionManager.internetState.value) {
             val preferences = TokenPreferences(applicationContext)
             val token = preferences.getToken() ?: YandexAuthToken("", 0)
             ApiFactory.initialize(token)
-
-            val repository = TodoItemsRepositoryImpl(applicationContext)
-            val repositoryNetwork = NetworkRepositoryImpl(applicationContext)
-
-            val syncInteractor = SyncInteractor(repository, repositoryNetwork)
-            CoroutineScope(Dispatchers.Default).launch {
-                syncInteractor.syncTasks()
-            }
+            connectionManager.refreshIn8hours()
         }
+    }
+
+    override fun getWorkManagerConfiguration(): Configuration {
+        return Configuration.Builder().build()
     }
 }

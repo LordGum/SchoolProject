@@ -11,6 +11,4 @@ sealed class MainScreenState {
         val todoList: List<TodoItem>,
         var count: Int
     ): MainScreenState()
-
-    data object NoInternet: MainScreenState()
 }

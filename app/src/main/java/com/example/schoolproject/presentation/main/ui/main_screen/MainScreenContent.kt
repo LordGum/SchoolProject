@@ -52,11 +52,12 @@ fun MainScreenContent(
     countDone: Int,
     onVisibilityIconClick: () -> Unit,
     visibilityState: Boolean,
-    onRefreshTodoList: () -> Deferred<Unit>
+    onRefreshTodoList: () -> Deferred<Unit>,
+    internetState: Boolean
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
     val pullToRefreshState = rememberPullToRefreshState(
-        enabled = { scrollBehavior.state.collapsedFraction == 0f }
+        enabled = { scrollBehavior.state.collapsedFraction == 0f  && internetState}
     )
     val listState = rememberLazyListState()
     val isTopScroll = remember { derivedStateOf { listState.firstVisibleItemIndex == 0 } }
@@ -82,7 +83,7 @@ fun MainScreenContent(
             Box(
                 modifier = Modifier.fillMaxWidth()
             ) {
-                if(pullToRefreshState.isRefreshing) {
+                if(pullToRefreshState.isRefreshing ) {
                     LaunchedEffect(true) {
                         scope.launch {
                             pullToRefreshState.startRefresh()
@@ -149,7 +150,8 @@ fun PreviewMainScreen(
             onVisibilityIconClick = {},
             visibilityState = true,
             countDone = 111,
-            onRefreshTodoList = { CoroutineScope(Dispatchers.Main).async {  } }
+            onRefreshTodoList = { CoroutineScope(Dispatchers.Main).async {  } },
+            internetState = true
         )
     }
 }
