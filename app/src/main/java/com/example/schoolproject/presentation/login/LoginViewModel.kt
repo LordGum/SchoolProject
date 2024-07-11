@@ -5,10 +5,8 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.schoolproject.data.NetworkRepositoryImpl
-import com.example.schoolproject.data.network.TokenPreferences
 import com.example.schoolproject.domain.usecases.network.CheckAuthStateUseCase
 import com.example.schoolproject.domain.usecases.network.GetAuthStateUseCase
-import com.example.schoolproject.presentation.detail.DetailScreenState
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

@@ -20,11 +20,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.util.Date
 
-class DetailViewModel (
+class DetailViewModel(
     application: Application
-): AndroidViewModel(application) {
+) : AndroidViewModel(application) {
     private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
-        Log.d("DetailViewModel", "Exception caught by exception handler. error = ${throwable.message}")
+        Log.d(
+            "DetailViewModel",
+            "Exception caught by exception handler. error = ${throwable.message}"
+        )
         _screenState.value = DetailScreenState.ErrorState
     }
     private val coroutineContext = Dispatchers.IO + exceptionHandler
@@ -45,7 +48,7 @@ class DetailViewModel (
 
     fun getTodoItem(id: String) {
         viewModelScope.launch(coroutineContext) {
-            if (id != TodoItem.UNDEFINED_ID ) {
+            if (id != TodoItem.UNDEFINED_ID) {
                 val item = getTodoItemUseCase(id)
                 _screenState.value = DetailScreenState.RefactorTodoItemState(item)
             } else {

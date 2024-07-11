@@ -18,13 +18,13 @@ import com.yandex.authsdk.YandexAuthSdk
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
         val viewModel = ViewModelProvider(this)[LoginViewModel::class.java]
         val sdk = YandexAuthSdk.create(YandexAuthOptions(this.applicationContext))
-        val launcher = registerForActivityResult (contract = sdk.contract) { result ->
+        val launcher = registerForActivityResult(contract = sdk.contract) { result ->
             handleResult(result, this.applicationContext)
             viewModel.performAuthResult()
         }
+
 
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -35,14 +35,19 @@ class MainActivity : ComponentActivity() {
                 when (authState.value) {
                     is AuthState.Authorized -> {
                         val preferences = TokenPreferences(applicationContext)
-                        val token = preferences.getToken() ?: throw RuntimeException("token is null")
+                        val token =
+                            preferences.getToken() ?: throw RuntimeException("token is null")
                         ApiFactory.initialize(token)
                         BaseScreen()
                     }
+
                     is AuthState.NotAuthorized -> {
-                        val loginOptions = YandexAuthLoginOptions()
-                        launcher.launch(loginOptions)
+                        AuthScreen {
+                            val loginOptions = YandexAuthLoginOptions()
+                            launcher.launch(loginOptions)
+                        }
                     }
+
                     is AuthState.Initial -> {}
                 }
             }

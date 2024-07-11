@@ -6,7 +6,7 @@ import com.example.schoolproject.data.network.model.ElementDto
 import com.example.schoolproject.domain.NetworkRepository
 import com.example.schoolproject.domain.TodoItemsRepository
 
-class SyncInteractor(
+class SyncInteract(
     private val localRepository: TodoItemsRepository,
     private val remoteRepository: NetworkRepository
 ) {

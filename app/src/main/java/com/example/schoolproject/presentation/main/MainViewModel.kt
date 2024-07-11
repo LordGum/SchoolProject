@@ -1,16 +1,12 @@
 package com.example.schoolproject.presentation.main
 
 import android.app.Application
-import android.content.Context
-import android.net.ConnectivityManager
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.work.WorkManager
 import com.example.schoolproject.data.NetworkRepositoryImpl
 import com.example.schoolproject.data.TodoItemsRepositoryImpl
-import com.example.schoolproject.data.utils.InternetConnectionManager
-import com.example.schoolproject.data.utils.SyncInteractor
+import com.example.schoolproject.data.utils.SyncInteract
 import com.example.schoolproject.domain.entities.TodoItem
 import com.example.schoolproject.domain.usecases.database.DeleteTodoItemUseCase
 import com.example.schoolproject.domain.usecases.database.GetTodoListUseCase
@@ -27,19 +23,14 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 class MainViewModel(
-    private val application: Application
-): AndroidViewModel(application) {
+    application: Application
+) : AndroidViewModel(application) {
 
     private val repository = TodoItemsRepositoryImpl(application)
     private val repositoryNetwork = NetworkRepositoryImpl(application)
+    private val connectionManager = repositoryNetwork.connectionManager
 
-    private val syncInteract = SyncInteractor(repository, repositoryNetwork)
-    private val connectionManager by lazy {
-        InternetConnectionManager(
-            connectivityManager = application.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager,
-            workManager = WorkManager.getInstance(application)
-        )
-    }
+    private val syncInteract = SyncInteract(repository, repositoryNetwork)
 
     private val getTodoListUseCase = GetTodoListUseCase(repository)
     private val deleteTodoItemUseCase = DeleteTodoItemUseCase(repository)
@@ -58,7 +49,7 @@ class MainViewModel(
     val internetState = connectionManager.internetState.value
 
     val screenState = getTodoListUseCase()
-        .onEach { list -> _count.value = list.count{ it.isCompleted } }
+        .onEach { list -> _count.value = list.count { it.isCompleted } }
         .map { MainScreenState.TodoList(todoList = it, _count.value) as MainScreenState }
 
     fun deleteTodoItem(id: String) {

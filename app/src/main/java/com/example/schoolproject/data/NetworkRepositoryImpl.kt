@@ -1,13 +1,17 @@
 package com.example.schoolproject.data
 
 import android.content.Context
+import android.net.ConnectivityManager
 import android.util.Log
+import androidx.core.content.ContextCompat.getSystemService
+import androidx.work.WorkManager
 import com.example.schoolproject.data.utils.mappers.MapperDto
 import com.example.schoolproject.data.network.ApiFactory
 import com.example.schoolproject.data.network.TokenPreferences
 import com.example.schoolproject.data.network.model.ResponseListDto
 import com.example.schoolproject.data.network.model.ReturnElementDto
 import com.example.schoolproject.data.network.model.ReturnElementListDto
+import com.example.schoolproject.data.utils.InternetConnectionManager
 import com.example.schoolproject.data.utils.isValid
 import com.example.schoolproject.domain.NetworkRepository
 import com.example.schoolproject.domain.entities.AuthState
@@ -26,7 +30,7 @@ import kotlinx.coroutines.launch
 
 class NetworkRepositoryImpl(
     context: Context
-): NetworkRepository {
+) : NetworkRepository {
 
     private val mapper = MapperDto()
     private val preferences = TokenPreferences(context)
@@ -34,6 +38,21 @@ class NetworkRepositoryImpl(
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
     private val exceptionHandler = CoroutineExceptionHandler { _, _ ->
         Log.d("MainViewModel", "Exception caught by exception handler")
+    }
+
+    val connectionManager by lazy {
+        InternetConnectionManager(
+            connectivityManager = getSystemService(
+                context,
+                ConnectivityManager::class.java
+            ) as ConnectivityManager,
+            workManager = WorkManager.getInstance(context)
+        )
+    }
+
+    init {
+        connectionManager.refreshOneTime()
+        connectionManager.refreshIn8hours()
     }
 
     private val token
@@ -45,7 +64,8 @@ class NetworkRepositoryImpl(
         checkAuthStateEvents.emit(Unit)
         checkAuthStateEvents.collect {
             val currentToken = token
-            val loggedIn = (currentToken != null) && (currentToken.value.isNotBlank()) && currentToken.isValid()
+            val loggedIn =
+                (currentToken != null) && (currentToken.value.isNotBlank()) && currentToken.isValid()
             val authState = if (loggedIn) AuthState.Authorized else AuthState.NotAuthorized
             emit(authState)
         }
@@ -57,7 +77,9 @@ class NetworkRepositoryImpl(
 
     override fun getAuthStateFlow(): StateFlow<AuthState> = authStateFlow
 
-    override suspend fun checkAuthState() { checkAuthStateEvents.emit(Unit) }
+    override suspend fun checkAuthState() {
+        checkAuthStateEvents.emit(Unit)
+    }
 
     override fun getTodoList(): Deferred<ResponseListDto> {
         return coroutineScope.async(exceptionHandler) {
@@ -75,7 +97,7 @@ class NetworkRepositoryImpl(
     override fun addTodoItem(todoItem: TodoItem) {
         coroutineScope.launch(exceptionHandler) {
             val revision = getTodoList().await().revision
-            val element =  ReturnElementDto(mapper.mapEntityToElement(todoItem))
+            val element = ReturnElementDto(mapper.mapEntityToElement(todoItem))
             apiService.addTodoItem(revision, element)
         }
     }
@@ -83,15 +105,15 @@ class NetworkRepositoryImpl(
     override fun refactorTodoItem(todoItem: TodoItem) {
         coroutineScope.launch(exceptionHandler) {
             val revision = getTodoList().await().revision
-            val element =  ReturnElementDto(mapper.mapEntityToElement(todoItem))
+            val element = ReturnElementDto(mapper.mapEntityToElement(todoItem))
             apiService.refactorTodoItem(todoItem.id, revision, element)
         }
     }
 
-    override fun refreshTodoItemList(list: List<TodoItem>): Deferred<ResponseListDto>  {
+    override fun refreshTodoItemList(list: List<TodoItem>): Deferred<ResponseListDto> {
         return coroutineScope.async(exceptionHandler) {
             val revision = getTodoList().await().revision
-            val returnList = ReturnElementListDto( list.map { mapper.mapEntityToElement(it) } )
+            val returnList = ReturnElementListDto(list.map { mapper.mapEntityToElement(it) })
             apiService.updateTodoItemListOnService(revision, returnList)
         }
     }
