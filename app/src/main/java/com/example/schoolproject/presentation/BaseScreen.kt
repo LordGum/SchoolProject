@@ -17,8 +17,7 @@ fun BaseScreen() {
     val navigationState = rememberNavigationState()
     val context = LocalContext.current as ComponentActivity
 
-    AppNavGraph(
-        navHostController = navigationState.navHostController,
+    AppNavGraph(navHostController = navigationState.navHostController,
         enterScreenContent = {},
         mainScreenContent = {
             val viewModel: MainViewModel = ViewModelProvider(context)[MainViewModel::class]
@@ -32,8 +31,7 @@ fun BaseScreen() {
                 },
                 onDeleteClick = { viewModel.deleteTodoItem(it) },
                 onDoneClick = { viewModel.doneTodoItem(it) },
-                onRefreshTodoList = { viewModel.refreshTodoList() },
-                internetState = viewModel.internetState
+                onRefreshTodoList = { viewModel.refreshTodoList() }
             )
         },
         detailScreenContent = { id ->
@@ -41,9 +39,7 @@ fun BaseScreen() {
             DetailScreen(
                 id = id,
                 viewModel = viewModel,
-                onBackClickListener = {
-                    navigationState.navHostController.popBackStack()
-                },
+                onBackClickListener = { navigationState.navHostController.popBackStack() },
                 onSaveClickListener = {
                     viewModel.saveTodoItem(it)
                     navigationState.navHostController.popBackStack()

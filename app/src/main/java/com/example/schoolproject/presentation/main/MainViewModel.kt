@@ -17,6 +17,7 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -30,6 +31,7 @@ class MainViewModel(
     private val repositoryNetwork = NetworkRepositoryImpl(application)
     private val connectionManager = repositoryNetwork.connectionManager
 
+    private val internetState = connectionManager.internetState
     private val syncInteract = SyncInteract(repository, repositoryNetwork)
 
     private val getTodoListUseCase = GetTodoListUseCase(repository)
@@ -46,11 +48,18 @@ class MainViewModel(
     }
     private val coroutineContext = Dispatchers.IO + exceptionHandler
 
-    val internetState = connectionManager.internetState.value
+    val errorState = repositoryNetwork.errorState
 
     val screenState = getTodoListUseCase()
         .onEach { list -> _count.value = list.count { it.isCompleted } }
-        .map { MainScreenState.TodoList(todoList = it, _count.value) as MainScreenState }
+        .map {
+            MainScreenState.TodoList(
+                todoList = it,
+                _count.value,
+                errorState.value
+            ) as MainScreenState
+        }
+
 
     fun deleteTodoItem(id: String) {
         viewModelScope.launch(coroutineContext) {
@@ -68,9 +77,9 @@ class MainViewModel(
 
     fun refreshTodoList(): Deferred<Unit> {
         return viewModelScope.async(coroutineContext) {
-            if (internetState) {
+            if (internetState.value) {
                 syncInteract.syncTasks()
-            }
+            } else delay(2000)
         }
     }
 }

@@ -6,5 +6,5 @@ import com.example.schoolproject.domain.entities.TodoItem
 class RefactorTodoItemNetworkUseCase(
     private val repository: NetworkRepository
 ) {
-    operator fun invoke(item: TodoItem) = repository.refactorTodoItem(item)
+    suspend operator fun invoke(item: TodoItem) = repository.refactorTodoItem(item)
 }

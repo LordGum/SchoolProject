@@ -1,5 +1,6 @@
 package com.example.schoolproject.presentation.main.ui.main_screen
 
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -13,6 +14,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
@@ -27,8 +29,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import com.example.schoolproject.domain.entities.ErrorState
 import com.example.schoolproject.domain.entities.TodoItem
 import com.example.schoolproject.presentation.ui_elements.PreviewData
 import com.example.schoolproject.ui.theme.AppTheme
@@ -53,21 +57,36 @@ fun MainScreenContent(
     onVisibilityIconClick: () -> Unit,
     visibilityState: Boolean,
     onRefreshTodoList: () -> Deferred<Unit>,
-    internetState: Boolean
+    errorState: ErrorState?
 ) {
-    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
+    val scrollBehavior =
+        TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
     val pullToRefreshState = rememberPullToRefreshState(
-        enabled = { scrollBehavior.state.collapsedFraction == 0f  && internetState}
+        enabled = { scrollBehavior.state.collapsedFraction == 0f  }
     )
     val listState = rememberLazyListState()
     val isTopScroll = remember { derivedStateOf { listState.firstVisibleItemIndex == 0 } }
     val scroll = remember { mutableStateOf(false) }
 
+    val snackBarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(scroll.value && !isTopScroll.value) {
         launch { listState.animateScrollToItem(index = 0) }
     }
+
+    val context = LocalContext.current
+    LaunchedEffect(errorState) {
+        errorState?.let {
+            launch {
+                val errorText = context.getString(errorState.toStringResource())
+                Log.d("tag", "errorState = $errorText")
+                snackBarHostState.showSnackbar(errorText)
+            }
+        }
+    }
+
+
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
@@ -77,13 +96,15 @@ fun MainScreenContent(
                 visibilityState = visibilityState,
                 onVisibilityIconClick = {
                     onVisibilityIconClick()
-                    if (isTopScroll.value) { scroll.value = true }
+                    if (isTopScroll.value) {
+                        scroll.value = true
+                    }
                 }
             )
             Box(
                 modifier = Modifier.fillMaxWidth()
             ) {
-                if(pullToRefreshState.isRefreshing ) {
+                if (pullToRefreshState.isRefreshing) {
                     LaunchedEffect(true) {
                         scope.launch {
                             pullToRefreshState.startRefresh()
@@ -109,7 +130,7 @@ fun MainScreenContent(
                 shape = CircleShape,
                 elevation = FloatingActionButtonDefaults.elevation(),
                 containerColor = Blue
-            ){
+            ) {
                 Icon(
                     imageVector = Icons.Filled.Add,
                     tint = Color.White,
@@ -118,7 +139,7 @@ fun MainScreenContent(
             }
         },
         floatingActionButtonPosition = FabPosition.End,
-    )  {
+    ) {
         Box(
             modifier = Modifier
                 .padding(it)
@@ -151,7 +172,7 @@ fun PreviewMainScreen(
             visibilityState = true,
             countDone = 111,
             onRefreshTodoList = { CoroutineScope(Dispatchers.Main).async {  } },
-            internetState = true
+            errorState = ErrorState.UnknownError
         )
     }
 }

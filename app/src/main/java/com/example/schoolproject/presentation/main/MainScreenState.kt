@@ -1,5 +1,6 @@
 package com.example.schoolproject.presentation.main
 
+import com.example.schoolproject.domain.entities.ErrorState
 import com.example.schoolproject.domain.entities.TodoItem
 
 sealed class MainScreenState {
@@ -9,6 +10,7 @@ sealed class MainScreenState {
 
     data class TodoList(
         val todoList: List<TodoItem>,
-        var count: Int
+        var count: Int,
+        val errorState: ErrorState?
     ): MainScreenState()
 }

@@ -17,14 +17,14 @@ fun MainScreen(
     onAddButtonClick: () -> Unit,
     onDeleteClick: (String) -> Unit,
     onDoneClick: (TodoItem) -> Unit,
-    onRefreshTodoList: () -> Deferred<Unit>,
-    internetState: Boolean
+    onRefreshTodoList: () -> Deferred<Unit>
 ) {
     val screenState = viewModel.screenState.collectAsState(MainScreenState.Loading)
     var currentState = screenState.value
     if (currentState is MainScreenState.TodoList) {
         if (currentState.todoList.isEmpty()) currentState = MainScreenState.Initial
     }
+    val errorState = viewModel.errorState
     val visibilityState = remember { mutableStateOf(true) }
 
     when (currentState) {
@@ -39,14 +39,19 @@ fun MainScreen(
                 onVisibilityIconClick = { visibilityState.value = !visibilityState.value },
                 visibilityState = visibilityState.value,
                 onRefreshTodoList = { onRefreshTodoList() },
-                internetState = internetState
+                errorState = errorState.value
             )
         }
+
         is MainScreenState.Loading -> {
             LoadingScreen()
         }
+
         is MainScreenState.Initial -> {
-            InitialScreen(onAddButtonClick = onAddButtonClick)
+            InitialScreen(
+                onAddButtonClick = onAddButtonClick,
+                errorState = errorState.value
+            )
         }
     }
 }
