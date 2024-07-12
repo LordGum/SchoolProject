@@ -107,4 +107,8 @@ dependencies {
 
     //work
     implementation("androidx.work:work-runtime:2.7.0")
+
+    //dagger2
+    implementation("com.google.dagger:dagger:2.47")
+    kapt("com.google.dagger:dagger-compiler:2.47")
 }

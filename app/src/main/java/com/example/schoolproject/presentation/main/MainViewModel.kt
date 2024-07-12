@@ -1,11 +1,10 @@
 package com.example.schoolproject.presentation.main
 
-import android.app.Application
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.schoolproject.data.NetworkRepositoryImpl
-import com.example.schoolproject.data.TodoItemsRepositoryImpl
+import com.example.schoolproject.data.utils.InternetConnectionManager
 import com.example.schoolproject.data.utils.SyncInteract
 import com.example.schoolproject.domain.entities.TodoItem
 import com.example.schoolproject.domain.usecases.database.DeleteTodoItemUseCase
@@ -23,28 +22,23 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class MainViewModel(
-    application: Application
-) : AndroidViewModel(application) {
-
-    private val repository = TodoItemsRepositoryImpl(application)
-    private val repositoryNetwork = NetworkRepositoryImpl(application)
-    private val connectionManager = repositoryNetwork.connectionManager
-    private val syncInteract = SyncInteract(repository, repositoryNetwork)
-
-    private val getTodoListUseCase = GetTodoListUseCase(repository)
-    private val deleteTodoItemUseCase = DeleteTodoItemUseCase(repository)
-    private val refactorTodoItemUseCase = RefactorTodoItemUseCase(repository)
-
-    private val deleteTodoItemNetworkUseCase = DeleteTodoNetworkUseCase(repositoryNetwork)
-    private val refactorTodoItemNetworkUseCase = RefactorTodoItemNetworkUseCase(repositoryNetwork)
+class MainViewModel @Inject constructor(
+    repositoryNetwork: NetworkRepositoryImpl,
+    private val syncInteract: SyncInteract,
+    private val connectionManager: InternetConnectionManager,
+    getTodoListUseCase: GetTodoListUseCase,
+    private val deleteTodoItemUseCase: DeleteTodoItemUseCase,
+    private val refactorTodoItemUseCase: RefactorTodoItemUseCase,
+    private val deleteTodoItemNetworkUseCase: DeleteTodoNetworkUseCase,
+    private val refactorTodoItemNetworkUseCase: RefactorTodoItemNetworkUseCase
+) : ViewModel() {
 
     private val exceptionHandler = CoroutineExceptionHandler { _, _ ->
         Log.d("MainViewModel", "Exception caught by exception handler")
     }
     private val coroutineContext = Dispatchers.IO + exceptionHandler
-
     private val _internetState = MutableStateFlow(false)
 
     init {

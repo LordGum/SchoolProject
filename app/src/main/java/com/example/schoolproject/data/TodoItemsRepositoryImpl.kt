@@ -1,7 +1,6 @@
 package com.example.schoolproject.data
 
-import android.content.Context
-import com.example.schoolproject.data.database.AppDatabase
+import com.example.schoolproject.data.database.TodoListDao
 import com.example.schoolproject.data.utils.mappers.MapperDb
 import com.example.schoolproject.domain.TodoItemsRepository
 import com.example.schoolproject.domain.entities.TodoItem
@@ -11,13 +10,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
-class TodoItemsRepositoryImpl(
-    context: Context
+class TodoItemsRepositoryImpl @Inject constructor(
+    private val todoDao: TodoListDao,
+    private val mapper: MapperDb
 ) : TodoItemsRepository {
 
-    private val todoDao = AppDatabase.getInstance(context).todoDao()
-    private val mapper = MapperDb()
     private val scope = CoroutineScope(Dispatchers.IO)
 
     override val todoList: Flow<List<TodoItem>> = todoDao.getTodoList().map {

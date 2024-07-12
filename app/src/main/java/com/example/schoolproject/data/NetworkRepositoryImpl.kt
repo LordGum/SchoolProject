@@ -1,10 +1,6 @@
 package com.example.schoolproject.data
 
-import android.content.Context
-import android.net.ConnectivityManager
-import androidx.core.content.ContextCompat.getSystemService
-import androidx.work.WorkManager
-import com.example.schoolproject.data.network.ApiFactory
+import com.example.schoolproject.data.network.ApiService
 import com.example.schoolproject.data.network.TokenPreferences
 import com.example.schoolproject.data.network.model.ElementDto
 import com.example.schoolproject.data.network.model.ResponseListDto
@@ -29,14 +25,15 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import retrofit2.Response
+import javax.inject.Inject
 
-class NetworkRepositoryImpl(
-    context: Context
+class NetworkRepositoryImpl @Inject constructor(
+    private val mapper: MapperDto,
+    private val preferences: TokenPreferences,
+    private val apiService: ApiService,
+    private val connectionManager: InternetConnectionManager
 ) : NetworkRepository {
 
-    private val mapper = MapperDto()
-    private val preferences = TokenPreferences(context)
-    private val apiService = ApiFactory.apiService
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
 
     private val _todoList = MutableStateFlow<List<ElementDto>>(emptyList())
@@ -72,13 +69,13 @@ class NetworkRepositoryImpl(
         throw RuntimeException("error in handle")
     }
 
-    val connectionManager = InternetConnectionManager(
-        connectivityManager = getSystemService(
-            context,
-            ConnectivityManager::class.java
-        ) as ConnectivityManager,
-        workManager = WorkManager.getInstance(context)
-    )
+//    val connectionManager = InternetConnectionManager(
+//        connectivityManager = getSystemService(
+//            context,
+//            ConnectivityManager::class.java
+//        ) as ConnectivityManager,
+//        workManager = WorkManager.getInstance(context)
+//    )
 
     init {
         coroutineScope.launch { getTodoList() }

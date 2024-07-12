@@ -4,8 +4,9 @@ import com.example.schoolproject.data.network.model.ElementDto
 import com.example.schoolproject.data.utils.mappers.MapperDto
 import com.example.schoolproject.domain.NetworkRepository
 import com.example.schoolproject.domain.TodoItemsRepository
+import javax.inject.Inject
 
-class SyncInteract(
+class SyncInteract @Inject constructor(
     private val localRepository: TodoItemsRepository,
     private val remoteRepository: NetworkRepository
 ) {

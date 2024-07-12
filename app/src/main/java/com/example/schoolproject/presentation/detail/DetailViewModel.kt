@@ -1,11 +1,8 @@
 package com.example.schoolproject.presentation.detail
 
-import android.app.Application
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.schoolproject.data.NetworkRepositoryImpl
-import com.example.schoolproject.data.TodoItemsRepositoryImpl
 import com.example.schoolproject.domain.entities.TodoItem
 import com.example.schoolproject.domain.usecases.database.AddTodoItemUseCase
 import com.example.schoolproject.domain.usecases.database.DeleteTodoItemUseCase
@@ -19,10 +16,17 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.util.Date
+import javax.inject.Inject
 
-class DetailViewModel(
-    application: Application
-) : AndroidViewModel(application) {
+class DetailViewModel @Inject constructor (
+    private val getTodoItemUseCase: GetTodoItemUseCase,
+    private val addTodoItemUseCase: AddTodoItemUseCase,
+    private val deleteTodoItemUseCase: DeleteTodoItemUseCase,
+    private val addTodoItemNetworkUseCase: AddTodoNetworkUseCase,
+    private val deleteTodoItemNetworkUseCase: DeleteTodoNetworkUseCase,
+    private val refactorTodoItemNetworkUseCase: RefactorTodoItemNetworkUseCase,
+) : ViewModel() {
+
     private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
         Log.d(
             "DetailViewModel",
@@ -31,17 +35,6 @@ class DetailViewModel(
         _screenState.value = DetailScreenState.ErrorState
     }
     private val coroutineContext = Dispatchers.IO + exceptionHandler
-
-    private val repository = TodoItemsRepositoryImpl(application)
-    private val repositoryNetwork = NetworkRepositoryImpl(application)
-
-    private val getTodoItemUseCase = GetTodoItemUseCase(repository)
-    private val addTodoItemUseCase = AddTodoItemUseCase(repository)
-    private val deleteTodoItemUseCase = DeleteTodoItemUseCase(repository)
-
-    private val addTodoItemNetworkUseCase = AddTodoNetworkUseCase(repositoryNetwork)
-    private val deleteTodoItemNetworkUseCase = DeleteTodoNetworkUseCase(repositoryNetwork)
-    private val refactorTodoItemNetworkUseCase = RefactorTodoItemNetworkUseCase(repositoryNetwork)
 
     private val _screenState = MutableStateFlow<DetailScreenState>(DetailScreenState.LoadingState)
     val screenState: StateFlow<DetailScreenState> = _screenState
@@ -72,11 +65,8 @@ class DetailViewModel(
 
     fun refactorTodoItem(todoItem: TodoItem) {
         viewModelScope.launch(coroutineContext) {
-            Log.d("tag", "before refactor")
             addTodoItemUseCase(todoItem).await()
-            Log.d("tag", "middle refactor")
             refactorTodoItemNetworkUseCase(todoItem)
-            Log.d("tag", "after refactor")
         }
     }
 

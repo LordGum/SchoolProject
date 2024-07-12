@@ -3,7 +3,6 @@ package com.example.schoolproject.data.utils
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
-import android.util.Log
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ExistingWorkPolicy
@@ -15,8 +14,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
-class InternetConnectionManager(
+class InternetConnectionManager @Inject constructor(
     private val connectivityManager: ConnectivityManager,
     private val workManager: WorkManager
 ) {
@@ -39,7 +39,6 @@ class InternetConnectionManager(
     }
 
     fun refreshOneTime() {
-        Log.d("tag", "in refresh")
         val request = OneTimeWorkRequest.Builder(
             RefreshDataWorker::class.java,
         ).setConstraints(constraints).build()
