@@ -92,9 +92,7 @@ class NetworkRepositoryImpl @Inject constructor(
 
     override fun getAuthStateFlow(): Flow<AuthState> = authStateFlow
 
-    override suspend fun checkAuthState() {
-        checkAuthStateEvents.emit(Unit)
-    }
+    override suspend fun checkAuthState() { checkAuthStateEvents.emit(Unit) }
 
     override suspend fun getTodoList() {
         if (checkInternet()) {

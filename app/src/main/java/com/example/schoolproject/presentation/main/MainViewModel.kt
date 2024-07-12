@@ -16,6 +16,7 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -71,7 +72,7 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch(coroutineContext) {
             connectionManager.internetState.collect { isConnected ->
                 _internetState.value = isConnected
-                syncInteract.syncTasks()
+                if (isConnected) syncInteract.syncTasks()
             }
         }
     }
@@ -93,7 +94,8 @@ class MainViewModel @Inject constructor(
 
     fun refreshTodoList(): Deferred<Unit> {
         return viewModelScope.async(coroutineContext) {
-            syncInteract.syncTasks()
+            if (_internetState.value) syncInteract.syncTasks()
+            else delay(2000)
         }
     }
 }
