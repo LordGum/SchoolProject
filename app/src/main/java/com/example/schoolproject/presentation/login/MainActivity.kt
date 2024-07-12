@@ -43,13 +43,11 @@ class MainActivity : ComponentActivity() {
         setContent {
             SchoolProjectTheme {
                 val authState = viewModel.authState.collectAsState(AuthState.Initial)
-                Log.d("tag", "auth = ${authState.value}")
 
                 when (authState.value) {
                     is AuthState.Authorized -> {
                         val preferences = TokenPreferences(applicationContext)
-                        val token =
-                            preferences.getToken() ?: throw RuntimeException("token is null")
+                        val token = preferences.getToken() ?: throw RuntimeException("token is null")
                         ApiFactory.initialize(token)
                         BaseScreen(viewModelFactory)
                     }
@@ -58,7 +56,6 @@ class MainActivity : ComponentActivity() {
                         AuthScreen {
                             val loginOptions = YandexAuthLoginOptions()
                             launcher.launch(loginOptions)
-                            viewModel.performAuthResult()
                         }
                     }
 

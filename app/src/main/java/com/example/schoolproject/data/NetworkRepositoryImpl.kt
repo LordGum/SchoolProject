@@ -15,13 +15,12 @@ import com.example.schoolproject.domain.entities.ErrorState
 import com.example.schoolproject.domain.entities.TodoItem
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import retrofit2.Response
@@ -69,14 +68,6 @@ class NetworkRepositoryImpl @Inject constructor(
         throw RuntimeException("error in handle")
     }
 
-//    val connectionManager = InternetConnectionManager(
-//        connectivityManager = getSystemService(
-//            context,
-//            ConnectivityManager::class.java
-//        ) as ConnectivityManager,
-//        workManager = WorkManager.getInstance(context)
-//    )
-
     init {
         coroutineScope.launch { getTodoList() }
         connectionManager.refreshOneTime()
@@ -97,13 +88,9 @@ class NetworkRepositoryImpl @Inject constructor(
             val authState = if (loggedIn) AuthState.Authorized else AuthState.NotAuthorized
             emit(authState)
         }
-    }.stateIn(
-        scope = coroutineScope,
-        started = SharingStarted.Lazily,
-        initialValue = AuthState.Initial
-    )
+    }
 
-    override fun getAuthStateFlow(): StateFlow<AuthState> = authStateFlow
+    override fun getAuthStateFlow(): Flow<AuthState> = authStateFlow
 
     override suspend fun checkAuthState() {
         checkAuthStateEvents.emit(Unit)

@@ -20,7 +20,7 @@ class SyncInteract @Inject constructor(
         val newElements = remoteList.filter { !localSet.contains(it.id) }
         localList.addAll(newElements.map { mapperDto.mapElementToEntity(it) })
 
-        remoteRepository.refreshTodoItemList(localList)
+        if(localList.isNotEmpty()) remoteRepository.refreshTodoItemList(localList)
         var totalList = remoteRepository.todoList.value
         if (totalList.isEmpty()) totalList = localList.map { mapperDto.mapEntityToElement(it) }
         syncLocalWithRemote(totalList)

@@ -4,6 +4,7 @@ import com.example.schoolproject.data.network.model.ElementDto
 import com.example.schoolproject.domain.entities.AuthState
 import com.example.schoolproject.domain.entities.ErrorState
 import com.example.schoolproject.domain.entities.TodoItem
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
 interface NetworkRepository {
@@ -12,7 +13,7 @@ interface NetworkRepository {
 
     val todoList: StateFlow<List<ElementDto>>
 
-    fun getAuthStateFlow(): StateFlow<AuthState>
+    fun getAuthStateFlow(): Flow<AuthState>
 
     suspend fun checkAuthState()
 
