@@ -15,11 +15,8 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,20 +25,15 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.schoolproject.R
-import com.example.schoolproject.domain.entities.ErrorState
 import com.example.schoolproject.presentation.main.ui.main_screen.Title
 import com.example.schoolproject.ui.theme.AppTheme
 import com.example.schoolproject.ui.theme.Blue
-import kotlinx.coroutines.launch
 
 
 @Composable
 fun InitialScreen(
-    onAddButtonClick: () -> Unit,
-    errorState: ErrorState?
+    onAddButtonClick: () -> Unit
 ) {
-    val snackBarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
     Scaffold(
         containerColor = AppTheme.colorScheme.backPrimary,
         floatingActionButton = {
@@ -89,11 +81,6 @@ fun InitialScreen(
                     )
                 }
             }
-        }
-
-        errorState?.let {
-            val errorText = stringResource(errorState.toStringResource())
-            scope.launch { snackBarHostState.showSnackbar(errorText) }
         }
     }
 }

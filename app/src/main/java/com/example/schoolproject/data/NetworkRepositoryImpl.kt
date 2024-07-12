@@ -2,7 +2,6 @@ package com.example.schoolproject.data
 
 import android.content.Context
 import android.net.ConnectivityManager
-import android.util.Log
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.work.WorkManager
 import com.example.schoolproject.data.network.ApiFactory
@@ -28,6 +27,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import retrofit2.Response
 
 class NetworkRepositoryImpl(
@@ -39,46 +39,49 @@ class NetworkRepositoryImpl(
     private val apiService = ApiFactory.apiService
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
 
+    private val _todoList = MutableStateFlow<List<ElementDto>>(emptyList())
+    override val todoList = _todoList.asStateFlow()
+
+    private val _revision = MutableStateFlow(0)
+
     private val _errorState: MutableStateFlow<ErrorState?> = MutableStateFlow(null)
     override val errorState: StateFlow<ErrorState?>
         get() = _errorState.asStateFlow()
 
-    private suspend fun handle(block: suspend () -> Response<ResponseListDto>): ResponseListDto? {
-        if (!connectionManager.internetState.value) {
-            Log.d("tag", "internet nonononono")
-            _errorState.update { ErrorState.NoInternetError }
-        }
+    private fun checkInternet(): Boolean {
+        if (connectionManager.internetState.value) return true
         else {
-            Log.d("tag", "internet yyyyy")
-            val response = block.invoke()
-            val body = response.body()
-            if (!response.isSuccessful || body == null) {
-                Log.d("tag", "error")
-                val typeError = when (response.code()) {
-                    400 -> ErrorState.RequestError
-                    401 -> ErrorState.NoAuthError
-                    404 -> ErrorState.NotFoundError
-                    500 -> ErrorState.ServerError
-                    else -> ErrorState.UnknownError
-                }
-                _errorState.update { typeError }
-            }
-            return body
+            _errorState.update { ErrorState.NoInternetError }
+            return false
         }
-        return null
     }
 
-    val connectionManager by lazy {
-        InternetConnectionManager(
-            connectivityManager = getSystemService(
-                context,
-                ConnectivityManager::class.java
-            ) as ConnectivityManager,
-            workManager = WorkManager.getInstance(context)
-        )
+    private suspend fun handle(block: suspend () -> Response<ResponseListDto>): ResponseListDto {
+        val response = block.invoke()
+        val body = response.body()
+        if (!response.isSuccessful || body == null) {
+            val typeError = when (response.code()) {
+                400 -> ErrorState.RequestError
+                401 -> ErrorState.NoAuthError
+                404 -> ErrorState.NotFoundError
+                500 -> ErrorState.ServerError
+                else -> ErrorState.UnknownError
+            }
+            _errorState.update { typeError }
+        } else return body
+        throw RuntimeException("error in handle")
     }
+
+    val connectionManager = InternetConnectionManager(
+        connectivityManager = getSystemService(
+            context,
+            ConnectivityManager::class.java
+        ) as ConnectivityManager,
+        workManager = WorkManager.getInstance(context)
+    )
 
     init {
+        coroutineScope.launch { getTodoList() }
         connectionManager.refreshOneTime()
         connectionManager.refreshIn8hours()
     }
@@ -109,41 +112,51 @@ class NetworkRepositoryImpl(
         checkAuthStateEvents.emit(Unit)
     }
 
-    override suspend fun getTodoList(): Pair<List<ElementDto>, Int> {
-        val response = handle { apiService.loadTodoItemList() }
-        val revision = response?.revision ?: throw RuntimeException("revision is null")
-        return response.list to revision
+    override suspend fun getTodoList() {
+        if (checkInternet()) {
+            val response = handle { apiService.loadTodoItemList() }
+            _todoList.update { response.list }
+            _revision.update { response.revision }
+        }
     }
 
     override suspend fun deleteTodoItem(id: String) {
-        handle {
-            val revision = getTodoList().second
-            apiService.deleteTodoItem(id, revision)
+        if (checkInternet()) {
+            val response = handle {
+                apiService.deleteTodoItem(id, _revision.value)
+            }
+            _revision.update { response.revision }
         }
     }
 
     override suspend fun addTodoItem(todoItem: TodoItem) {
-        handle {
-            val revision = getTodoList().second
-            val element = ReturnElementDto(mapper.mapEntityToElement(todoItem))
-            apiService.addTodoItem(revision, element)
+        if (checkInternet()) {
+            val response = handle {
+                val element = ReturnElementDto(mapper.mapEntityToElement(todoItem))
+                apiService.addTodoItem(_revision.value, element)
+            }
+            _revision.update { response.revision }
         }
     }
 
     override suspend fun refactorTodoItem(todoItem: TodoItem) {
-        handle {
-            val revision = getTodoList().second
-            val element = ReturnElementDto(mapper.mapEntityToElement(todoItem))
-            apiService.refactorTodoItem(todoItem.id, revision, element)
+        if (checkInternet()) {
+            val response = handle {
+                val element = ReturnElementDto(mapper.mapEntityToElement(todoItem))
+                apiService.refactorTodoItem(todoItem.id, _revision.value, element)
+            }
+            _revision.update { response.revision }
         }
     }
 
-    override suspend fun refreshTodoItemList(list: List<TodoItem>): List<ElementDto> {
-        val response = handle {
-            val revision = getTodoList().second
-            val returnList = ReturnElementListDto(list.map { mapper.mapEntityToElement(it) })
-            apiService.updateTodoItemListOnService(revision, returnList)
+    override suspend fun refreshTodoItemList(list: List<TodoItem>) {
+        if (checkInternet()) {
+            val response = handle {
+                val returnList = ReturnElementListDto(list.map { mapper.mapEntityToElement(it) })
+                apiService.updateTodoItemListOnService(_revision.value, returnList)
+            }
+            _todoList.update { response.list }
+            _revision.update { response.revision }
         }
-        return response?.list ?: throw RuntimeException("list is null")
     }
 }

@@ -1,6 +1,5 @@
 package com.example.schoolproject.data.network
 
-import android.util.Log
 import com.yandex.authsdk.YandexAuthToken
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -13,12 +12,10 @@ object ApiFactory {
 
     private const val BASE_URL = "https://hive.mrdekk.ru/todo/"
 
-    private  var token: YandexAuthToken? = null
+    private var token: YandexAuthToken? = null
 
     fun initialize(token: YandexAuthToken?) {
         this.token = token
-        Log.d("tag", "token = ${token?.value ?: "Lalaith"}")
-        Log.d("tag", "time = ${token?.expiresIn ?: 0}")
     }
 
     private val client = OkHttpClient.Builder()
@@ -29,7 +26,7 @@ object ApiFactory {
         .build()
 
     private fun auth(chain: Interceptor.Chain): okhttp3.Response {
-        val request: Request = if(token != null) {
+        val request: Request = if (token != null) {
             chain.request().newBuilder()
                 .addHeader("Authorization", "OAuth ${token!!.value}")
                 .build()

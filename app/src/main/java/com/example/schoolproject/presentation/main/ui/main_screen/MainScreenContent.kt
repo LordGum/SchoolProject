@@ -1,6 +1,7 @@
 package com.example.schoolproject.presentation.main.ui.main_screen
 
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -14,6 +15,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
@@ -53,28 +55,28 @@ fun MainScreenContent(
     onAddButtonClick: () -> Unit,
     onDeleteClick: (String) -> Unit,
     onDoneClick: (TodoItem) -> Unit,
-    countDone: Int,
+    onRefreshTodoList: () -> Deferred<Unit>,
     onVisibilityIconClick: () -> Unit,
     visibilityState: Boolean,
-    onRefreshTodoList: () -> Deferred<Unit>,
+    countDone: Int,
     errorState: ErrorState?
 ) {
     val scrollBehavior =
         TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
     val pullToRefreshState = rememberPullToRefreshState(
-        enabled = { scrollBehavior.state.collapsedFraction == 0f  }
+        enabled = { scrollBehavior.state.collapsedFraction == 0f }
     )
     val listState = rememberLazyListState()
     val isTopScroll = remember { derivedStateOf { listState.firstVisibleItemIndex == 0 } }
     val scroll = remember { mutableStateOf(false) }
 
-    val snackBarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(scroll.value && !isTopScroll.value) {
         launch { listState.animateScrollToItem(index = 0) }
     }
 
+    val snackBarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
     LaunchedEffect(errorState) {
         errorState?.let {
@@ -86,9 +88,12 @@ fun MainScreenContent(
         }
     }
 
-
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        snackbarHost = { SnackbarHost(
+            hostState = snackBarHostState,
+            modifier = Modifier.background(AppTheme.colorScheme.backPrimary)
+        ) },
         topBar = {
             TopAppBar(
                 scrollBehavior = scrollBehavior,
@@ -171,8 +176,8 @@ fun PreviewMainScreen(
             onVisibilityIconClick = {},
             visibilityState = true,
             countDone = 111,
-            onRefreshTodoList = { CoroutineScope(Dispatchers.Main).async {  } },
-            errorState = ErrorState.UnknownError
+            onRefreshTodoList = { CoroutineScope(Dispatchers.Main).async { } },
+            errorState = null
         )
     }
 }

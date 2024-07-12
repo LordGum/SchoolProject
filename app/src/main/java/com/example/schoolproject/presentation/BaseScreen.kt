@@ -31,7 +31,8 @@ fun BaseScreen() {
                 },
                 onDeleteClick = { viewModel.deleteTodoItem(it) },
                 onDoneClick = { viewModel.doneTodoItem(it) },
-                onRefreshTodoList = { viewModel.refreshTodoList() }
+                onRefreshTodoList = { viewModel.refreshTodoList() },
+
             )
         },
         detailScreenContent = { id ->

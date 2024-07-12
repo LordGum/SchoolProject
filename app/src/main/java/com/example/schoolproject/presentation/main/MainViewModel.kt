@@ -17,10 +17,11 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class MainViewModel(
@@ -30,8 +31,6 @@ class MainViewModel(
     private val repository = TodoItemsRepositoryImpl(application)
     private val repositoryNetwork = NetworkRepositoryImpl(application)
     private val connectionManager = repositoryNetwork.connectionManager
-
-    private val internetState = connectionManager.internetState
     private val syncInteract = SyncInteract(repository, repositoryNetwork)
 
     private val getTodoListUseCase = GetTodoListUseCase(repository)
@@ -41,24 +40,47 @@ class MainViewModel(
     private val deleteTodoItemNetworkUseCase = DeleteTodoNetworkUseCase(repositoryNetwork)
     private val refactorTodoItemNetworkUseCase = RefactorTodoItemNetworkUseCase(repositoryNetwork)
 
-    private val _count = MutableStateFlow(0)
-
     private val exceptionHandler = CoroutineExceptionHandler { _, _ ->
         Log.d("MainViewModel", "Exception caught by exception handler")
     }
     private val coroutineContext = Dispatchers.IO + exceptionHandler
 
-    val errorState = repositoryNetwork.errorState
+    private val _internetState = MutableStateFlow(false)
 
-    val screenState = getTodoListUseCase()
-        .onEach { list -> _count.value = list.count { it.isCompleted } }
-        .map {
-            MainScreenState.TodoList(
-                todoList = it,
-                _count.value,
-                errorState.value
-            ) as MainScreenState
+    init {
+        observeInternetConnection()
+    }
+
+    private val _screenState = MutableStateFlow<MainScreenState>(MainScreenState.TodoList())
+    val screenState: StateFlow<MainScreenState> = combine(
+        _screenState,
+        getTodoListUseCase.invoke(),
+        repositoryNetwork.errorState
+    ) { state, list, error ->
+        if (state is MainScreenState.TodoList) {
+            state.copy(
+                todoList = list,
+                count = list.count { it.isCompleted },
+                errorState = error
+            )
+        } else {
+            state
         }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = MainScreenState.Loading
+    )
+
+
+    private fun observeInternetConnection() {
+        viewModelScope.launch(coroutineContext) {
+            connectionManager.internetState.collect { isConnected ->
+                _internetState.value = isConnected
+                syncInteract.syncTasks()
+            }
+        }
+    }
 
 
     fun deleteTodoItem(id: String) {
@@ -77,9 +99,7 @@ class MainViewModel(
 
     fun refreshTodoList(): Deferred<Unit> {
         return viewModelScope.async(coroutineContext) {
-            if (internetState.value) {
-                syncInteract.syncTasks()
-            } else delay(2000)
+            syncInteract.syncTasks()
         }
     }
 }

@@ -2,7 +2,6 @@ package com.example.schoolproject.data
 
 import android.content.Context
 import com.example.schoolproject.data.database.AppDatabase
-import com.example.schoolproject.data.database.TodoItemDbModel
 import com.example.schoolproject.data.utils.mappers.MapperDb
 import com.example.schoolproject.domain.TodoItemsRepository
 import com.example.schoolproject.domain.entities.TodoItem
@@ -15,7 +14,7 @@ import kotlinx.coroutines.flow.map
 
 class TodoItemsRepositoryImpl(
     context: Context
-): TodoItemsRepository {
+) : TodoItemsRepository {
 
     private val todoDao = AppDatabase.getInstance(context).todoDao()
     private val mapper = MapperDb()
@@ -27,8 +26,10 @@ class TodoItemsRepositoryImpl(
         }
     }
 
-    override fun getTodoList(): List<TodoItemDbModel> {
-        return todoDao.getAllItems()
+    override fun getTodoList(): List<TodoItem> {
+        return todoDao.getAllItems().map {
+            mapper.dbModelToEntity(it)
+        }
     }
 
     override suspend fun deleteTodoList() {
@@ -36,7 +37,7 @@ class TodoItemsRepositoryImpl(
     }
 
     override suspend fun addTodoList(todoList: List<TodoItem>) {
-        todoDao.insertAll( todoList.map { mapper.entityToDbModel(it) })
+        todoDao.insertAll(todoList.map { mapper.entityToDbModel(it) })
     }
 
     override suspend fun addTodoItem(todoItem: TodoItem): Deferred<Unit> {

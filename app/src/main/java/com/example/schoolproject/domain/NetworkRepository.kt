@@ -10,11 +10,13 @@ interface NetworkRepository {
 
     val errorState: StateFlow<ErrorState?>
 
+    val todoList: StateFlow<List<ElementDto>>
+
     fun getAuthStateFlow(): StateFlow<AuthState>
 
     suspend fun checkAuthState()
 
-    suspend fun getTodoList(): Pair<List<ElementDto>, Int>
+    suspend fun getTodoList()
 
     suspend fun deleteTodoItem(id: String)
 
@@ -22,5 +24,5 @@ interface NetworkRepository {
 
     suspend fun refactorTodoItem(todoItem: TodoItem)
 
-    suspend fun refreshTodoItemList(list: List<TodoItem>) : List<ElementDto>
+    suspend fun refreshTodoItemList(list: List<TodoItem>)
 }

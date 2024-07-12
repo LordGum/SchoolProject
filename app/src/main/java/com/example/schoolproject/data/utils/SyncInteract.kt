@@ -1,7 +1,6 @@
 package com.example.schoolproject.data.utils
 
 import com.example.schoolproject.data.network.model.ElementDto
-import com.example.schoolproject.data.utils.mappers.MapperDb
 import com.example.schoolproject.data.utils.mappers.MapperDto
 import com.example.schoolproject.domain.NetworkRepository
 import com.example.schoolproject.domain.TodoItemsRepository
@@ -11,19 +10,19 @@ class SyncInteract(
     private val remoteRepository: NetworkRepository
 ) {
     private val mapperDto = MapperDto()
-    private val mapperDb = MapperDb()
 
     suspend fun syncTasks() {
-        val localList =
-            localRepository.getTodoList().map { mapperDb.dbModelToEntity(it) }.toMutableList()
+        val localList = localRepository.getTodoList().toMutableList()
         val localSet = localList.map { it.id }.toHashSet()
-        val remoteList = remoteRepository.getTodoList()
+        val remoteList = remoteRepository.todoList.value
 
-        val newElements = remoteList.first.filter { !localSet.contains(it.id) }
+        val newElements = remoteList.filter { !localSet.contains(it.id) }
         localList.addAll(newElements.map { mapperDto.mapElementToEntity(it) })
 
-        val mergeList = remoteRepository.refreshTodoItemList(localList)
-        syncLocalWithRemote(mergeList)
+        remoteRepository.refreshTodoItemList(localList)
+        var totalList = remoteRepository.todoList.value
+        if (totalList.isEmpty()) totalList = localList.map { mapperDto.mapEntityToElement(it) }
+        syncLocalWithRemote(totalList)
     }
 
     private suspend fun syncLocalWithRemote(mergeList: List<ElementDto>) {

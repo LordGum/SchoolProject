@@ -1,5 +1,6 @@
 package com.example.schoolproject.presentation.main
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
@@ -22,10 +23,13 @@ fun MainScreen(
     val screenState = viewModel.screenState.collectAsState(MainScreenState.Loading)
     var currentState = screenState.value
     if (currentState is MainScreenState.TodoList) {
-        if (currentState.todoList.isEmpty()) currentState = MainScreenState.Initial
+        if (currentState.todoList.isEmpty()) {
+            Log.d("tag", "list is empty")
+            currentState = MainScreenState.Initial
+        }
     }
-    val errorState = viewModel.errorState
     val visibilityState = remember { mutableStateOf(true) }
+
 
     when (currentState) {
         is MainScreenState.TodoList -> {
@@ -39,7 +43,7 @@ fun MainScreen(
                 onVisibilityIconClick = { visibilityState.value = !visibilityState.value },
                 visibilityState = visibilityState.value,
                 onRefreshTodoList = { onRefreshTodoList() },
-                errorState = errorState.value
+                errorState = currentState.errorState
             )
         }
 
@@ -50,7 +54,6 @@ fun MainScreen(
         is MainScreenState.Initial -> {
             InitialScreen(
                 onAddButtonClick = onAddButtonClick,
-                errorState = errorState.value
             )
         }
     }

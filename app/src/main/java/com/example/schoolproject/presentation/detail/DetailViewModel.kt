@@ -72,8 +72,11 @@ class DetailViewModel(
 
     fun refactorTodoItem(todoItem: TodoItem) {
         viewModelScope.launch(coroutineContext) {
+            Log.d("tag", "before refactor")
             addTodoItemUseCase(todoItem).await()
+            Log.d("tag", "middle refactor")
             refactorTodoItemNetworkUseCase(todoItem)
+            Log.d("tag", "after refactor")
         }
     }
 
