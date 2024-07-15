@@ -48,6 +48,8 @@ class MainActivity : ComponentActivity() {
                     isDark = isDark.value,
                     changeTheme = { isDark.value = it }
                 )
+
+
 //                val authState = viewModel.authState.collectAsState(AuthState.Initial)
 //
 //                when (authState.value) {

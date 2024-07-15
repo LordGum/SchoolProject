@@ -78,23 +78,24 @@ private fun Item1(
         modifier = Modifier
             .fillMaxWidth()
             .height(72.dp)
-            .padding(start = 16.dp, 8.dp),
+            .padding(start = 0.dp, 8.dp),
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.SpaceAround
     ) {
         Text(
+            modifier = Modifier.padding(start = 16.dp),
             text = stringResource(R.string.important),
             color = AppTheme.colorScheme.primary,
             fontSize = 16.sp,
             fontFamily = FontFamily.Default
         )
-        Spacer(modifier = Modifier.height(4.dp))
         PriorityMenu(
             item = item,
             onItemChange = onItemChange
         )
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(4.dp))
         Canvas(modifier = Modifier
+            .padding(start = 16.dp)
             .fillMaxSize()
             .height(1.dp)
         ) {
