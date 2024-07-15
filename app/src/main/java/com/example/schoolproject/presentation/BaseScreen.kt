@@ -1,7 +1,10 @@
 package com.example.schoolproject.presentation
 
 import androidx.activity.ComponentActivity
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModelProvider
 import com.example.schoolproject.ViewModelFactory
@@ -15,7 +18,9 @@ import com.example.schoolproject.presentation.main.MainViewModel
 
 @Composable
 fun BaseScreen(
-    viewModelFactory: ViewModelFactory
+    viewModelFactory: ViewModelFactory,
+    isDark: Boolean,
+    changeTheme: (Boolean) -> Unit
 ) {
     val navigationState = rememberNavigationState()
     val context = LocalContext.current as ComponentActivity
@@ -35,7 +40,8 @@ fun BaseScreen(
                 onDeleteClick = { viewModel.deleteTodoItem(it) },
                 onDoneClick = { viewModel.doneTodoItem(it) },
                 onRefreshTodoList = { viewModel.refreshTodoList() },
-
+                isDark = isDark,
+                changeTheme = changeTheme
             )
         },
         detailScreenContent = { id ->

@@ -6,14 +6,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.FloatingActionButtonDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -29,7 +23,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
@@ -59,7 +52,9 @@ fun MainScreenContent(
     onVisibilityIconClick: () -> Unit,
     visibilityState: Boolean,
     countDone: Int,
-    errorState: ErrorState?
+    errorState: ErrorState?,
+    isDark: Boolean,
+    onChangeTheme: (Boolean) -> Unit
 ) {
     val scrollBehavior =
         TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
@@ -90,10 +85,12 @@ fun MainScreenContent(
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        snackbarHost = { SnackbarHost(
-            hostState = snackBarHostState,
-            modifier = Modifier.background(AppTheme.colorScheme.backPrimary)
-        ) },
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackBarHostState,
+                modifier = Modifier.background(AppTheme.colorScheme.backPrimary)
+            )
+        },
         topBar = {
             TopAppBar(
                 scrollBehavior = scrollBehavior,
@@ -130,18 +127,11 @@ fun MainScreenContent(
         },
         containerColor = AppTheme.colorScheme.backPrimary,
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = { onAddButtonClick() },
-                shape = CircleShape,
-                elevation = FloatingActionButtonDefaults.elevation(),
-                containerColor = Blue
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Add,
-                    tint = Color.White,
-                    contentDescription = null
-                )
-            }
+            FAB(
+                isDark = isDark,
+                onAddButtonClick = onAddButtonClick,
+                onThemeChange = onChangeTheme
+            )
         },
         floatingActionButtonPosition = FabPosition.End,
     ) {
@@ -177,7 +167,9 @@ fun PreviewMainScreen(
             visibilityState = true,
             countDone = 111,
             onRefreshTodoList = { CoroutineScope(Dispatchers.Main).async { } },
-            errorState = null
+            errorState = null,
+            isDark = isDarkTheme,
+            onChangeTheme = {}
         )
     }
 }

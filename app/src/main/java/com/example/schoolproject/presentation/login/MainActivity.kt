@@ -4,6 +4,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModelProvider
 import com.example.schoolproject.ApplicationClass
 import com.example.schoolproject.ViewModelFactory
@@ -25,19 +28,26 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         component.value.inject(this)
 
-        val viewModel = ViewModelProvider(this, viewModelFactory)[LoginViewModel::class.java]
-        val sdk = YandexAuthSdk.create(YandexAuthOptions(this.applicationContext))
-        val launcher = registerForActivityResult(contract = sdk.contract) { result ->
-            handleResult(result, this.applicationContext)
-            viewModel.performAuthResult()
-        }
+//        val viewModel = ViewModelProvider(this, viewModelFactory)[LoginViewModel::class.java]
+//        val sdk = YandexAuthSdk.create(YandexAuthOptions(this.applicationContext))
+//        val launcher = registerForActivityResult(contract = sdk.contract) { result ->
+//            handleResult(result, this.applicationContext)
+//            viewModel.performAuthResult()
+//        }
 
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            SchoolProjectTheme {
+            val currentTheme = isSystemInDarkTheme()
+            val isDark = remember { mutableStateOf( currentTheme ) }
+            SchoolProjectTheme(darkTheme = isDark.value) {
 
-                BaseScreen(viewModelFactory)
+
+                BaseScreen(
+                    viewModelFactory,
+                    isDark = isDark.value,
+                    changeTheme = { isDark.value = it }
+                )
 //                val authState = viewModel.authState.collectAsState(AuthState.Initial)
 //
 //                when (authState.value) {
