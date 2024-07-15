@@ -11,8 +11,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -43,17 +45,21 @@ fun TopAppBar(
     val isTittleExpand = if (scrollBehavior.state.collapsedFraction < 0.8f) true else false
     val fontSize = animateFloatAsState(
         targetValue = if (isTittleExpand) AppTheme.typography.largeTitle.fontSize.value
-                        else AppTheme.typography.title.fontSize.value,
+        else AppTheme.typography.title.fontSize.value,
         label = "TitleFontSize"
     )
     val lineHeight = animateFloatAsState(
         targetValue = if (isTittleExpand) AppTheme.typography.largeTitle.lineHeight.value
-                        else AppTheme.typography.title.lineHeight.value,
+        else AppTheme.typography.title.lineHeight.value,
         label = "TitleLineHeight"
     )
     val isShadowNeed = scrollBehavior.state.contentOffset < 0
     val elevation = animateDpAsState(
-        targetValue = if (isShadowNeed) { 20.dp } else { 0.dp },
+        targetValue = if (isShadowNeed) {
+            20.dp
+        } else {
+            0.dp
+        },
         label = "elevation"
     )
 
@@ -93,17 +99,24 @@ fun TopAppBar(
                             style = AppTheme.typography.body,
                             modifier = Modifier.padding(top = 4.dp)
                         )
-                        Icon(
-                            painter = painterResource(
-                                id = if (visibilityState) R.drawable.ic_visibility
-                                else R.drawable.ic_visibility_off
-                            ),
-                            tint = Blue,
-                            contentDescription = stringResource(R.string.visibility_button_desc),
+
+                        IconButton(
+                            onClick = { onVisibilityIconClick() },
                             modifier = Modifier
                                 .clickable { onVisibilityIconClick() }
                                 .padding(horizontal = 20.dp)
-                        )
+                                .size(24.dp)
+                        ) {
+                            Icon(
+                                modifier = Modifier.size(24.dp),
+                                painter = painterResource(
+                                    id = if (visibilityState) R.drawable.ic_visibility
+                                    else R.drawable.ic_visibility_off
+                                ),
+                                tint = Blue,
+                                contentDescription = stringResource(R.string.visibility_button_desc)
+                            )
+                        }
                     }
                 }
             }

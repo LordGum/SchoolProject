@@ -18,7 +18,9 @@ fun MainScreen(
     onAddButtonClick: () -> Unit,
     onDeleteClick: (String) -> Unit,
     onDoneClick: (TodoItem) -> Unit,
-    onRefreshTodoList: () -> Deferred<Unit>
+    onRefreshTodoList: () -> Deferred<Unit>,
+    isDark: Boolean,
+    changeTheme: (Boolean) -> Unit
 ) {
     val screenState = viewModel.screenState.collectAsState(MainScreenState.Loading)
     var currentState = screenState.value
@@ -43,7 +45,9 @@ fun MainScreen(
                 onVisibilityIconClick = { visibilityState.value = !visibilityState.value },
                 visibilityState = visibilityState.value,
                 onRefreshTodoList = { onRefreshTodoList() },
-                errorState = currentState.errorState
+                errorState = currentState.errorState,
+                onChangeTheme = changeTheme,
+                isDark = isDark
             )
         }
 
