@@ -44,7 +44,7 @@ fun InitialScreen(
                 shape = CircleShape,
                 elevation = FloatingActionButtonDefaults.elevation(),
                 containerColor = Blue
-            ){
+            ) {
                 Icon(
                     imageVector = Icons.Filled.Add,
                     tint = Color.White,
@@ -53,7 +53,7 @@ fun InitialScreen(
             }
         },
         floatingActionButtonPosition = FabPosition.End,
-    )  { paddingValues ->
+    ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()

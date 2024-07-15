@@ -100,9 +100,15 @@ dependencies {
     //rv
     implementation("androidx.recyclerview:recyclerview:1.2.1")
 
-
     //coroutine
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.5.0")
+
+    //work
+    implementation("androidx.work:work-runtime:2.7.0")
+
+    //dagger2
+    implementation("com.google.dagger:dagger:2.47")
+    kapt("com.google.dagger:dagger-compiler:2.47")
 }

@@ -1,33 +1,35 @@
 package com.example.schoolproject.presentation.login
 
-import android.app.Application
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.schoolproject.data.NetworkRepositoryImpl
-import com.example.schoolproject.data.network.TokenPreferences
+import com.example.schoolproject.domain.entities.AuthState
 import com.example.schoolproject.domain.usecases.network.CheckAuthStateUseCase
 import com.example.schoolproject.domain.usecases.network.GetAuthStateUseCase
-import com.example.schoolproject.presentation.detail.DetailScreenState
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class LoginViewModel(
-    context: Application
-) : AndroidViewModel(context) {
+class LoginViewModel @Inject constructor(
+    getAuthStateFlowUseCase: GetAuthStateUseCase,
+    private val checkAuthStateUseCase: CheckAuthStateUseCase
+) : ViewModel() {
 
-    private val repository = NetworkRepositoryImpl(context)
-
-    private val getAuthStateFlowUseCase = GetAuthStateUseCase(repository)
-    private val checkAuthStateUseCase = CheckAuthStateUseCase(repository)
-
+    private val coroutineScope = CoroutineScope(Dispatchers.Default)
     private val exceptionHandler = CoroutineExceptionHandler { _, _ ->
         Log.d("LoginViewModel", "Exception caught by exception handler")
     }
     private val coroutineContext = Dispatchers.IO + exceptionHandler
 
-    val authState = getAuthStateFlowUseCase()
+    val authState = getAuthStateFlowUseCase().stateIn(
+        scope = coroutineScope,
+        started = SharingStarted.Lazily,
+        initialValue = AuthState.Initial
+    )
 
     fun performAuthResult() {
         viewModelScope.launch(coroutineContext) {

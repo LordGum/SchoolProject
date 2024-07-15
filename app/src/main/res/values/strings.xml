@@ -24,4 +24,11 @@
     <string name="chose_date">Выберете дату</string>
     <string name="choose_date_cancel">Нельзя выбрать прошедшую дату</string>
     <string name="no_internet_title">Кажется что то с интернетом, \nпопробуйте позже</string>
+    <string name="enter_button">Войти</string>
+    <string name="no_internet_error">Нет интернета</string>
+    <string name="server_error">Ошибка на сервере</string>
+    <string name="no_auth_error">Нет авторизации</string>
+    <string name="no_found_error">не найден объект</string>
+    <string name="unknown_error">неизвестная ошибка</string>
+    <string name="request_error">ошибка отправки данных</string>
 </resources>

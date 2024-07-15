@@ -1,5 +1,7 @@
 package com.example.schoolproject.presentation.main.ui.main_screen
 
+import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -13,6 +15,8 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
@@ -27,15 +31,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import com.example.schoolproject.domain.entities.ErrorState
 import com.example.schoolproject.domain.entities.TodoItem
 import com.example.schoolproject.presentation.ui_elements.PreviewData
 import com.example.schoolproject.ui.theme.AppTheme
 import com.example.schoolproject.ui.theme.AppThemePreview
 import com.example.schoolproject.ui.theme.Blue
 import com.example.schoolproject.ui.theme.SchoolProjectTheme
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -46,12 +55,17 @@ fun MainScreenContent(
     onAddButtonClick: () -> Unit,
     onDeleteClick: (String) -> Unit,
     onDoneClick: (TodoItem) -> Unit,
-    countDone: Int,
+    onRefreshTodoList: () -> Deferred<Unit>,
     onVisibilityIconClick: () -> Unit,
-    visibilityState: Boolean
+    visibilityState: Boolean,
+    countDone: Int,
+    errorState: ErrorState?
 ) {
-    val pullToRefreshState = rememberPullToRefreshState()
-    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
+    val scrollBehavior =
+        TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
+    val pullToRefreshState = rememberPullToRefreshState(
+        enabled = { scrollBehavior.state.collapsedFraction == 0f }
+    )
     val listState = rememberLazyListState()
     val isTopScroll = remember { derivedStateOf { listState.firstVisibleItemIndex == 0 } }
     val scroll = remember { mutableStateOf(false) }
@@ -61,8 +75,25 @@ fun MainScreenContent(
     LaunchedEffect(scroll.value && !isTopScroll.value) {
         launch { listState.animateScrollToItem(index = 0) }
     }
+
+    val snackBarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
+    LaunchedEffect(errorState) {
+        errorState?.let {
+            launch {
+                val errorText = context.getString(errorState.toStringResource())
+                Log.d("tag", "errorState = $errorText")
+                snackBarHostState.showSnackbar(errorText)
+            }
+        }
+    }
+
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        snackbarHost = { SnackbarHost(
+            hostState = snackBarHostState,
+            modifier = Modifier.background(AppTheme.colorScheme.backPrimary)
+        ) },
         topBar = {
             TopAppBar(
                 scrollBehavior = scrollBehavior,
@@ -70,17 +101,19 @@ fun MainScreenContent(
                 visibilityState = visibilityState,
                 onVisibilityIconClick = {
                     onVisibilityIconClick()
-                    if (isTopScroll.value) { scroll.value = true }
+                    if (isTopScroll.value) {
+                        scroll.value = true
+                    }
                 }
             )
             Box(
                 modifier = Modifier.fillMaxWidth()
             ) {
-                if(pullToRefreshState.isRefreshing) {
+                if (pullToRefreshState.isRefreshing) {
                     LaunchedEffect(true) {
                         scope.launch {
                             pullToRefreshState.startRefresh()
-                            delay(3000) // TODO: work с API
+                            onRefreshTodoList().await()
                             pullToRefreshState.endRefresh()
                         }
                     }
@@ -102,7 +135,7 @@ fun MainScreenContent(
                 shape = CircleShape,
                 elevation = FloatingActionButtonDefaults.elevation(),
                 containerColor = Blue
-            ){
+            ) {
                 Icon(
                     imageVector = Icons.Filled.Add,
                     tint = Color.White,
@@ -111,7 +144,7 @@ fun MainScreenContent(
             }
         },
         floatingActionButtonPosition = FabPosition.End,
-    )  {
+    ) {
         Box(
             modifier = Modifier
                 .padding(it)
@@ -142,7 +175,9 @@ fun PreviewMainScreen(
             onDeleteClick = {},
             onVisibilityIconClick = {},
             visibilityState = true,
-            countDone = 111
+            countDone = 111,
+            onRefreshTodoList = { CoroutineScope(Dispatchers.Main).async { } },
+            errorState = null
         )
     }
 }

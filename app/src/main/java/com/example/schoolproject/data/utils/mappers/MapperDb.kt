@@ -1,9 +1,10 @@
-package com.example.schoolproject.data.mappers
+package com.example.schoolproject.data.utils.mappers
 
 import com.example.schoolproject.data.database.TodoItemDbModel
 import com.example.schoolproject.domain.entities.TodoItem
+import javax.inject.Inject
 
-class MapperDb {
+class MapperDb @Inject constructor() {
     fun entityToDbModel(todoItem: TodoItem): TodoItemDbModel {
         return TodoItemDbModel(
             id = todoItem.id,

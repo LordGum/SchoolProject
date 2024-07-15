@@ -1,9 +1,7 @@
 package com.example.schoolproject.data
 
-import android.content.Context
-import com.example.schoolproject.data.database.AppDatabase
-import com.example.schoolproject.data.database.TodoItemDbModel
-import com.example.schoolproject.data.mappers.MapperDb
+import com.example.schoolproject.data.database.TodoListDao
+import com.example.schoolproject.data.utils.mappers.MapperDb
 import com.example.schoolproject.domain.TodoItemsRepository
 import com.example.schoolproject.domain.entities.TodoItem
 import kotlinx.coroutines.CoroutineScope
@@ -12,13 +10,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
-class TodoItemsRepositoryImpl(
-    context: Context
-): TodoItemsRepository {
+class TodoItemsRepositoryImpl @Inject constructor(
+    private val todoDao: TodoListDao,
+    private val mapper: MapperDb
+) : TodoItemsRepository {
 
-    private val todoDao = AppDatabase.getInstance(context).todoDao()
-    private val mapper = MapperDb()
     private val scope = CoroutineScope(Dispatchers.IO)
 
     override val todoList: Flow<List<TodoItem>> = todoDao.getTodoList().map {
@@ -27,8 +25,10 @@ class TodoItemsRepositoryImpl(
         }
     }
 
-    override fun getTodoList(): List<TodoItemDbModel> {
-        return todoDao.getAllItems()
+    override fun getTodoList(): List<TodoItem> {
+        return todoDao.getAllItems().map {
+            mapper.dbModelToEntity(it)
+        }
     }
 
     override suspend fun deleteTodoList() {
@@ -36,7 +36,7 @@ class TodoItemsRepositoryImpl(
     }
 
     override suspend fun addTodoList(todoList: List<TodoItem>) {
-        todoDao.insertAll( todoList.map { mapper.entityToDbModel(it) })
+        todoDao.insertAll(todoList.map { mapper.entityToDbModel(it) })
     }
 
     override suspend fun addTodoItem(todoItem: TodoItem): Deferred<Unit> {

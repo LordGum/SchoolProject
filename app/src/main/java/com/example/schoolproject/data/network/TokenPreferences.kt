@@ -6,8 +6,9 @@ import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.yandex.authsdk.YandexAuthToken
 import java.util.Date
+import javax.inject.Inject
 
-class TokenPreferences(context: Context) {
+class TokenPreferences @Inject constructor(context: Context) {
 
     private val masterKeyAlias = MasterKey.Builder(context)
             .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)

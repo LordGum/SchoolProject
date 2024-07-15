@@ -6,10 +6,11 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 
-@Database(entities = [TodoItemDbModel::class], version = 5, exportSchema = false)
+@Database(entities = [TodoItemDbModel::class], version = 6, exportSchema = false)
 @TypeConverters(Converter::class)
 abstract class AppDatabase: RoomDatabase() {
     companion object {
+        @Volatile
         private var db: AppDatabase? = null
         private const val DB_NAME = "todolist.db"
         private val LOCK = Any()
@@ -17,7 +18,6 @@ abstract class AppDatabase: RoomDatabase() {
         fun getInstance(context: Context): AppDatabase {
             db?.let { return it }
             synchronized(LOCK) {
-                db?.let { return it }
                 val instance = Room.databaseBuilder(
                     context,
                     AppDatabase::class.java,

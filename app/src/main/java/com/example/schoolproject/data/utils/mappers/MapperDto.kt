@@ -1,14 +1,15 @@
-package com.example.schoolproject.data.mappers
+package com.example.schoolproject.data.utils.mappers
 
 import com.example.schoolproject.data.network.model.ElementDto
 import com.example.schoolproject.data.network.model.ImportanceDto
 import com.example.schoolproject.domain.entities.TodoItem
 import java.util.Date
+import javax.inject.Inject
 
-class MapperDto {
+class MapperDto @Inject constructor() {
 
     private fun mapImportanceToPriority(level: ImportanceDto): TodoItem.Priority {
-        return when(level) {
+        return when (level) {
             ImportanceDto.low -> TodoItem.Priority.LOW
             ImportanceDto.basic -> TodoItem.Priority.NORMAL
             ImportanceDto.important -> TodoItem.Priority.HIGH
@@ -30,7 +31,7 @@ class MapperDto {
     }
 
     private fun mapPriorityToImportance(priority: TodoItem.Priority): ImportanceDto {
-        return when(priority) {
+        return when (priority) {
             TodoItem.Priority.LOW -> ImportanceDto.low
             TodoItem.Priority.NORMAL -> ImportanceDto.basic
             TodoItem.Priority.HIGH -> ImportanceDto.important
@@ -45,7 +46,7 @@ class MapperDto {
             isCompleted = elementDto.done,
             createdDate = Date(elementDto.createdAt),
             modifiedDate = Date(elementDto.changeAt),
-            deadline = if(elementDto.deadline != null) Date(elementDto.deadline) else null
+            deadline = if (elementDto.deadline != null) Date(elementDto.deadline) else null
         )
     }
 
