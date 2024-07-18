@@ -7,6 +7,7 @@ import com.example.schoolproject.data.NetworkRepositoryImpl
 import com.example.schoolproject.data.utils.InternetConnectionManager
 import com.example.schoolproject.data.utils.SyncInteract
 import com.example.schoolproject.domain.entities.TodoItem
+import com.example.schoolproject.domain.usecases.database.AddTodoItemUseCase
 import com.example.schoolproject.domain.usecases.database.DeleteTodoItemUseCase
 import com.example.schoolproject.domain.usecases.database.GetTodoListUseCase
 import com.example.schoolproject.domain.usecases.database.RefactorTodoItemUseCase
@@ -30,6 +31,7 @@ class MainViewModel @Inject constructor(
     private val syncInteract: SyncInteract,
     private val connectionManager: InternetConnectionManager,
     getTodoListUseCase: GetTodoListUseCase,
+    private val addTodoItemUseCase: AddTodoItemUseCase,
     private val deleteTodoItemUseCase: DeleteTodoItemUseCase,
     private val refactorTodoItemUseCase: RefactorTodoItemUseCase,
     private val deleteTodoItemNetworkUseCase: DeleteTodoNetworkUseCase,
@@ -77,11 +79,22 @@ class MainViewModel @Inject constructor(
         }
     }
 
-
-    fun deleteTodoItem(id: String) {
+    fun addReserveTodoItem(item: TodoItem) {
+        Log.d("tag", "add reserve")
         viewModelScope.launch(coroutineContext) {
-            deleteTodoItemUseCase(id).await()
-            deleteTodoItemNetworkUseCase(id)
+            addTodoItemUseCase(item).await()
+        }
+    }
+
+    fun deleteTodoItem(id: String, isNetwork: Boolean) {
+        viewModelScope.launch(coroutineContext) {
+            if (!isNetwork) {
+                Log.d("tag", "delete in db")
+                deleteTodoItemUseCase(id).await()
+            } else {
+                Log.d("tag", "delete in network")
+                deleteTodoItemNetworkUseCase(id)
+            }
         }
     }
 

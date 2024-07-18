@@ -1,10 +1,7 @@
 package com.example.schoolproject.presentation
 
 import androidx.activity.ComponentActivity
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModelProvider
 import com.example.schoolproject.ViewModelFactory
@@ -37,7 +34,9 @@ fun BaseScreen(
                 onAddButtonClick = {
                     navigationState.navigateToDetailScreen(TodoItem.UNDEFINED_ID)
                 },
-                onDeleteClick = { viewModel.deleteTodoItem(it) },
+                onAddReserveTodoItem = { viewModel.addReserveTodoItem(it) },
+                onDeleteClick = { id, isNetwork ->
+                    viewModel.deleteTodoItem(id, isNetwork) },
                 onDoneClick = { viewModel.doneTodoItem(it) },
                 onRefreshTodoList = { viewModel.refreshTodoList() },
                 isDark = isDark,

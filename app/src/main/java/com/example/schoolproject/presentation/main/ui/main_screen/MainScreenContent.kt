@@ -1,6 +1,5 @@
 package com.example.schoolproject.presentation.main.ui.main_screen
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -9,8 +8,10 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
@@ -21,12 +22,15 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import com.example.schoolproject.R
 import com.example.schoolproject.domain.entities.ErrorState
 import com.example.schoolproject.domain.entities.TodoItem
 import com.example.schoolproject.presentation.ui_elements.PreviewData
@@ -39,6 +43,7 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import okhttp3.internal.format
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,7 +51,8 @@ fun MainScreenContent(
     list: List<TodoItem>,
     onTodoItemClick: (TodoItem) -> Unit,
     onAddButtonClick: () -> Unit,
-    onDeleteClick: (String) -> Unit,
+    onDeleteClick: (String, Boolean) -> Unit,
+    onAddReserveTodoItem: (TodoItem) -> Unit,
     onDoneClick: (TodoItem) -> Unit,
     onRefreshTodoList: () -> Deferred<Unit>,
     onVisibilityIconClick: () -> Unit,
@@ -77,11 +83,33 @@ fun MainScreenContent(
         errorState?.let {
             launch {
                 val errorText = context.getString(errorState.toStringResource())
-                Log.d("tag", "errorState = $errorText")
                 snackBarHostState.showSnackbar(errorText)
             }
         }
     }
+
+    val todoItemKey = rememberSaveable { mutableStateOf<TodoItem?>(null) }
+    val dismissKey = rememberSaveable { mutableStateOf<Int?>(null) }
+    val text = stringResource(id = R.string.cancel_snackbar_name)
+    val cancelButton = stringResource(id = R.string.cancel)
+    LaunchedEffect(dismissKey.value) {
+        todoItemKey.value?.let { todoItem ->
+            launch {
+                val result = snackBarHostState.showSnackbar(
+                    message = format(text, todoItem.text),
+                    actionLabel = cancelButton,
+                    duration = SnackbarDuration.Short
+                )
+                if (result == SnackbarResult.ActionPerformed) {
+                    onAddReserveTodoItem(todoItem)
+                } else {
+                    onDeleteClick(todoItem.id, true)
+                    todoItemKey.value = null
+                }
+            }
+        }
+    }
+
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -118,8 +146,7 @@ fun MainScreenContent(
 
                 PullToRefreshContainer(
                     state = pullToRefreshState,
-                    modifier = Modifier
-                        .align(Alignment.TopCenter),
+                    modifier = Modifier.align(Alignment.TopCenter),
                     containerColor = AppTheme.colorScheme.backPrimary,
                     contentColor = Blue
                 )
@@ -129,7 +156,11 @@ fun MainScreenContent(
         floatingActionButton = {
             FAB(
                 isDark = isDark,
-                onAddButtonClick = onAddButtonClick,
+                onAddButtonClick = {
+                    onAddButtonClick()
+                    todoItemKey.value = null
+                    dismissKey.value = null
+                },
                 onThemeChange = onChangeTheme
             )
         },
@@ -142,9 +173,17 @@ fun MainScreenContent(
         ) {
             List(
                 list = list,
-                onDeleteClick = onDeleteClick,
+                onDeleteClick = { todoItem ->
+                    todoItemKey.value = todoItem
+                    dismissKey.value = (dismissKey.value ?: 0) + 1
+                    onDeleteClick(todoItem.id, false)
+                },
                 onDoneClick = onDoneClick,
-                onTodoItemClick = onTodoItemClick,
+                onTodoItemClick = { todoItem ->
+                    onTodoItemClick(todoItem)
+                    todoItemKey.value = null
+                    dismissKey.value = null
+                },
                 visibilityState = visibilityState
             )
         }
@@ -162,7 +201,8 @@ fun PreviewMainScreen(
             onTodoItemClick = {},
             onAddButtonClick = {},
             onDoneClick = {},
-            onDeleteClick = {},
+            onAddReserveTodoItem = {},
+            onDeleteClick = { _, _ -> },
             onVisibilityIconClick = {},
             visibilityState = true,
             countDone = 111,

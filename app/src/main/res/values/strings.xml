@@ -31,4 +31,6 @@
     <string name="no_found_error">не найден объект</string>
     <string name="unknown_error">неизвестная ошибка</string>
     <string name="request_error">ошибка отправки данных</string>
+    <string name="cancel_snackbar_name">Удалить %s</string>
+    <string name="cancel">Отменить</string>
 </resources>
