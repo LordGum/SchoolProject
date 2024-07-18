@@ -80,7 +80,6 @@ class MainViewModel @Inject constructor(
     }
 
     fun addReserveTodoItem(item: TodoItem) {
-        Log.d("tag", "add reserve")
         viewModelScope.launch(coroutineContext) {
             addTodoItemUseCase(item).await()
         }
@@ -89,10 +88,8 @@ class MainViewModel @Inject constructor(
     fun deleteTodoItem(id: String, isNetwork: Boolean) {
         viewModelScope.launch(coroutineContext) {
             if (!isNetwork) {
-                Log.d("tag", "delete in db")
                 deleteTodoItemUseCase(id).await()
             } else {
-                Log.d("tag", "delete in network")
                 deleteTodoItemNetworkUseCase(id)
             }
         }
@@ -100,8 +97,9 @@ class MainViewModel @Inject constructor(
 
     fun doneTodoItem(todoItem: TodoItem) {
         viewModelScope.launch(coroutineContext) {
-            refactorTodoItemUseCase(todoItem.copy(isCompleted = !todoItem.isCompleted))
-            refactorTodoItemNetworkUseCase(todoItem.copy(isCompleted = !todoItem.isCompleted))
+            val isCompleted = !todoItem.isCompleted
+            refactorTodoItemUseCase(todoItem.copy(isCompleted = isCompleted))
+            refactorTodoItemNetworkUseCase(todoItem.copy(isCompleted = isCompleted))
         }
     }
 
