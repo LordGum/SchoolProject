@@ -14,21 +14,6 @@
             "bottom": 12
           },
           "content_alignment_vertical": "center",
-          "border": {
-            "corner_radius": 14,
-            "shadow": {
-              "offset": {
-                "x": {
-                  "value": 1
-                },
-                "y": {
-                  "value": 4
-                }
-              },
-              "color": "#000"
-            },
-            "has_shadow": true
-          },
           "items": [
             {
               "type": "separator",
