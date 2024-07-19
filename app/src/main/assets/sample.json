@@ -6,12 +6,6 @@
         "state_id": 0,
         "div": {
           "type": "container",
-          "background": [
-            {
-              "color": "#F1EBDC",
-              "type": "solid"
-            }
-          ],
           "orientation": "vertical",
           "margins": {
             "left": 12,
@@ -130,7 +124,7 @@
                   "background": [
                     {
                       "type": "solid",
-                      "color": "#000"
+                      "color": "#FF007AFF"
                     }
                   ],
                   "alignment_horizontal": "center",
@@ -139,7 +133,7 @@
                   "type": "_template_button",
                   "width": {
                     "type": "fixed",
-                    "value": 90
+                    "value": 120
                   },
                   "text": "Далее",
                   "paddings": {
