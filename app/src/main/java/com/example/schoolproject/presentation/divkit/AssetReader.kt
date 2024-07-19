@@ -25,7 +25,7 @@ private fun toString(input: InputStream): String {
     val builder = StringBuilder(input.available())
     var read: Int
     while (reader.read(buffer).also { read = it } != -1) {
-        builder.appendRange(buffer, 0, read) // TODO: &&&
+        builder.appendRange(buffer, 0, read)
     }
     return builder.toString()
 }

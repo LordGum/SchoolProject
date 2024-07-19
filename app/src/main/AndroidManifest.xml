@@ -16,11 +16,17 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SchoolProject"
         tools:targetApi="31">
+
         <meta-data
             android:name="YANDEX_CLIENT_ID"
             android:value="${YANDEX_CLIENT_ID}" />
         <activity
             android:name=".presentation.login.MainActivity"
+            android:theme="@style/Theme.SchoolProject">
+        </activity>
+
+        <activity
+            android:name=".presentation.divkit.DivActivity"
             android:exported="true"
             android:theme="@style/Theme.SchoolProject">
             <intent-filter>
@@ -28,6 +34,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
 
         <provider
             android:name="androidx.startup.InitializationProvider"

@@ -135,6 +135,13 @@
                     "type": "fixed",
                     "value": 120
                   },
+                  "actions": [
+                    {
+                      "log_id": "button_next",
+                      "type": "url",
+                      "url": "my-action://close"
+                    }
+                  ],
                   "text": "Далее",
                   "paddings": {
                     "top": 8,
