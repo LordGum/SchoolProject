@@ -1,0 +1,26 @@
+{
+    "variables": [
+      {
+        "name": "palette",
+        "type": "dict",
+        "value": {
+          "light": {
+            "primary_color": "#000000",
+            "back_primary": "f7f6f2",
+            "tertiary": "40000000"
+          },
+          "dark": {
+            "primary_color": "#ffffff",
+            "back_primary": "161618",
+            "tertiary": "60ffffff"
+          }
+        }
+      },
+
+      {
+        "name": "app_theme",
+        "type": "string",
+        "value": "light"
+      }
+    ]
+}

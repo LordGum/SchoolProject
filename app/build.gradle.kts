@@ -111,4 +111,13 @@ dependencies {
     //dagger2
     implementation("com.google.dagger:dagger:2.47")
     kapt("com.google.dagger:dagger-compiler:2.47")
+
+    //divkit
+    val version = "30.9.0"
+    implementation("com.yandex.div:div:$version")
+    implementation("com.yandex.div:div-core:$version")
+    implementation("com.yandex.div:div-json:$version")
+
+    //glide
+    implementation("com.yandex.div:glide:$version")
 }

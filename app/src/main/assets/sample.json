@@ -1,0 +1,201 @@
+{
+  "card": {
+    "log_id": "card",
+    "states": [
+      {
+        "state_id": 0,
+        "div": {
+          "type": "container",
+          "background": [
+            {
+              "color": "#F1EBDC",
+              "type": "solid"
+            }
+          ],
+          "orientation": "vertical",
+          "margins": {
+            "left": 12,
+            "right": 12,
+            "top": 12,
+            "bottom": 12
+          },
+          "content_alignment_vertical": "center",
+          "border": {
+            "corner_radius": 14,
+            "shadow": {
+              "offset": {
+                "x": {
+                  "value": 1
+                },
+                "y": {
+                  "value": 4
+                }
+              },
+              "color": "#000"
+            },
+            "has_shadow": true
+          },
+          "items": [
+            {
+              "type": "separator",
+              "height": {
+                "type": "fixed",
+                "value": 50
+              },
+              "alpha": 0
+            },
+            {
+              "type": "container",
+              "orientation": "horizontal",
+              "width":{
+                "type": "match_parent"
+              },
+              "content_alignment_horizontal": "center",
+              "items": [
+                {
+                  "type": "separator",
+                  "width": {
+                    "type": "fixed",
+                    "value": 200
+                  },
+                  "alpha": 0
+                },
+                {
+                  "type": "image",
+                  "image_url": "https://is1-ssl.mzstatic.com/image/thumb/Purple115/v4/d6/90/b3/d690b35d-72b1-cf17-4cf7-37150f3461f1/AppIcon-1x_U007emarketing-0-0-GLES2_U002c0-512MB-sRGB-0-0-0-85-220-0-0-0-6.png/512x512bb.jpg?raw=true",
+                  "aspect": {
+                    "ratio": 1
+                  },
+                  "width": {
+                    "type": "fixed",
+                    "value": 100
+                  },
+                  "height": {
+                    "type": "fixed",
+                    "value": 100
+                  },
+                  "alignment_horizontal": "center",
+                  "content_alignment_vertical": "top"
+                },
+                {
+                  "type": "separator",
+                  "width": {
+                    "type": "fixed",
+                    "value": 200
+                  },
+                  "alpha": 0
+                }
+              ]
+            },
+            {
+              "type": "container",
+              "orientation": "vertical",
+              "width":{
+                "type": "fixed",
+                "value": 370
+              },
+              "content_alignment_horizontal": "center",
+              "items": [
+                {
+                  "type": "separator",
+                  "height": {
+                    "type": "fixed",
+                    "value": 50
+                  },
+                  "alpha": 0
+                },
+                {
+                  "type": "text",
+                  "text": "TodoApp - приложение для ведения личного списка задач и планирования",
+                  "text_alignment_horizontal": "center",
+                  "width": {
+                    "type": "match_parent"
+                  },
+                  "paddings": {
+                    "left": 20,
+                    "right": 20
+                  },
+                  "text_color" : "",
+                  "font_size": 18
+                },
+                {
+                  "type": "separator",
+                  "height": {
+                    "type": "fixed",
+                    "value": 440
+                  },
+                  "alpha": 0
+                },
+                {
+                  "background": [
+                    {
+                      "type": "solid",
+                      "color": "#000"
+                    }
+                  ],
+                  "alignment_horizontal": "center",
+                  "text_color": "#fff",
+                  "corners": 20,
+                  "type": "_template_button",
+                  "width": {
+                    "type": "fixed",
+                    "value": 90
+                  },
+                  "text": "Далее",
+                  "paddings": {
+                    "top": 8,
+                    "right": 28,
+                    "bottom": 8,
+                    "left": 28
+                  },
+                  "height": {
+                    "type": "fixed",
+                    "value": 30
+                  }
+                },
+                {
+                  "type": "separator",
+                  "height": {
+                    "type": "fixed",
+                    "value": 10
+                  },
+                  "alpha": 0
+                },
+                {
+                  "type": "text",
+                  "text": "Нажмите на \"Далее\", чтобы продолжить",
+                  "font_size": 12,
+                  "text_alignment_horizontal": "center"
+                },
+                {
+                  "type": "separator",
+                  "height": {
+                    "type": "fixed",
+                    "value": 50
+                  },
+                  "alpha": 0
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "templates": {
+    "_template_button": {
+      "type": "text",
+      "text_alignment_horizontal": "center",
+      "text_alignment_vertical": "center",
+      "border": {
+        "$corner_radius": "corners"
+      },
+      "paddings": {
+        "bottom": 24,
+        "left": 28,
+        "right": 28,
+        "top": 22
+      }
+    }
+  }
+}
