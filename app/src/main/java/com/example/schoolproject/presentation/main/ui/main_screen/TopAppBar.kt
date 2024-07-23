@@ -26,11 +26,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.schoolproject.R
 import com.example.schoolproject.ui.theme.AppTheme
 import com.example.schoolproject.ui.theme.Blue
+import okhttp3.internal.format
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -97,7 +100,19 @@ fun TopAppBar(
                             text = stringResource(R.string.underlable, doneTasks),
                             color = AppTheme.colorScheme.tertiary,
                             style = AppTheme.typography.title,
-                            modifier = Modifier.padding(top = 4.dp)
+                            modifier = Modifier.padding(top = 4.dp).semantics {
+                                contentDescription = when(doneTasks) {
+                                    0 -> "Выполнено 0 задач"
+                                    1 -> "Выполнена 1 задача"
+                                    else -> {
+                                        val ost = doneTasks%10
+                                        when (ost) {
+                                            2, 3, 4 -> format("Выполнено %d задачи", doneTasks)
+                                            else -> format("Выполнено %d задач", doneTasks)
+                                        }
+                                    }
+                                }
+                            }
                         )
 
                         IconButton(
