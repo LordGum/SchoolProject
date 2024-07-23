@@ -7,6 +7,7 @@ import com.example.schoolproject.data.NetworkRepositoryImpl
 import com.example.schoolproject.data.utils.InternetConnectionManager
 import com.example.schoolproject.data.utils.SyncInteract
 import com.example.schoolproject.domain.entities.TodoItem
+import com.example.schoolproject.domain.usecases.database.AddTodoItemUseCase
 import com.example.schoolproject.domain.usecases.database.DeleteTodoItemUseCase
 import com.example.schoolproject.domain.usecases.database.GetTodoListUseCase
 import com.example.schoolproject.domain.usecases.database.RefactorTodoItemUseCase
@@ -30,6 +31,7 @@ class MainViewModel @Inject constructor(
     private val syncInteract: SyncInteract,
     private val connectionManager: InternetConnectionManager,
     getTodoListUseCase: GetTodoListUseCase,
+    private val addTodoItemUseCase: AddTodoItemUseCase,
     private val deleteTodoItemUseCase: DeleteTodoItemUseCase,
     private val refactorTodoItemUseCase: RefactorTodoItemUseCase,
     private val deleteTodoItemNetworkUseCase: DeleteTodoNetworkUseCase,
@@ -77,18 +79,27 @@ class MainViewModel @Inject constructor(
         }
     }
 
-
-    fun deleteTodoItem(id: String) {
+    fun addReserveTodoItem(item: TodoItem) {
         viewModelScope.launch(coroutineContext) {
-            deleteTodoItemUseCase(id).await()
-            deleteTodoItemNetworkUseCase(id)
+            addTodoItemUseCase(item).await()
+        }
+    }
+
+    fun deleteTodoItem(id: String, isNetwork: Boolean) {
+        viewModelScope.launch(coroutineContext) {
+            if (!isNetwork) {
+                deleteTodoItemUseCase(id).await()
+            } else {
+                deleteTodoItemNetworkUseCase(id)
+            }
         }
     }
 
     fun doneTodoItem(todoItem: TodoItem) {
         viewModelScope.launch(coroutineContext) {
-            refactorTodoItemUseCase(todoItem.copy(isCompleted = !todoItem.isCompleted))
-            refactorTodoItemNetworkUseCase(todoItem.copy(isCompleted = !todoItem.isCompleted))
+            val isCompleted = !todoItem.isCompleted
+            refactorTodoItemUseCase(todoItem.copy(isCompleted = isCompleted))
+            refactorTodoItemNetworkUseCase(todoItem.copy(isCompleted = isCompleted))
         }
     }
 

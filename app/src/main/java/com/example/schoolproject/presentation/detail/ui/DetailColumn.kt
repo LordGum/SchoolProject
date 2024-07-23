@@ -48,14 +48,15 @@ fun DetailColumn(
     onItemChange: (TodoItem) -> Unit,
     onDeleteIconClickListener: () -> Unit
 ) {
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .background(AppTheme.colorScheme.backPrimary)
-        .padding(0.dp, 16.dp, 12.dp, 16.dp),
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(AppTheme.colorScheme.backPrimary)
+            .padding(0.dp, 16.dp, 12.dp, 16.dp),
         verticalArrangement = Arrangement.Center
     ) {
         Item1(
-            item = item ,
+            item = item,
             onItemChange = onItemChange
         )
         Item2(
@@ -78,25 +79,26 @@ private fun Item1(
         modifier = Modifier
             .fillMaxWidth()
             .height(72.dp)
-            .padding(start = 16.dp, 8.dp),
+            .padding(start = 0.dp, 8.dp),
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.SpaceAround
     ) {
         Text(
+            modifier = Modifier.padding(start = 16.dp),
             text = stringResource(R.string.important),
             color = AppTheme.colorScheme.primary,
-            fontSize = 16.sp,
-            fontFamily = FontFamily.Default
+            style = AppTheme.typography.body
         )
-        Spacer(modifier = Modifier.height(4.dp))
         PriorityMenu(
             item = item,
             onItemChange = onItemChange
         )
-        Spacer(modifier = Modifier.height(8.dp))
-        Canvas(modifier = Modifier
-            .fillMaxSize()
-            .height(1.dp)
+        Spacer(modifier = Modifier.height(4.dp))
+        Canvas(
+            modifier = Modifier
+                .padding(start = 16.dp)
+                .fillMaxSize()
+                .height(1.dp)
         ) {
             itemLine(Gray)
         }
@@ -119,8 +121,8 @@ private fun Item2(
     item: TodoItem,
     onItemChange: (TodoItem) -> Unit
 ) {
-    val checkState = rememberSaveable{ mutableStateOf(item.deadline != null) }
-    val openDialogState = rememberSaveable{ mutableStateOf(false) }
+    val checkState = rememberSaveable { mutableStateOf(item.deadline != null) }
+    val openDialogState = rememberSaveable { mutableStateOf(false) }
     val currentItem = rememberSaveable { mutableStateOf(item) }
     val formatter = SimpleDateFormat("dd MMMM yyyy", Locale.getDefault())
 
@@ -147,13 +149,14 @@ private fun Item2(
                 Text(
                     text = stringResource(R.string.deadline),
                     color = AppTheme.colorScheme.primary,
-                    fontSize = 16.sp,
-                    fontFamily = FontFamily.Default
+                    style = AppTheme.typography.body
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 if (currentItem.value.deadline != null) {
                     Text(
-                        text = formatter.format(currentItem.value.deadline ?: throw RuntimeException("date is null")),
+                        text = formatter.format(
+                            currentItem.value.deadline ?: throw RuntimeException("date is null")
+                        ),
                         color = Blue,
                         fontSize = 14.sp,
                         fontFamily = FontFamily.Default
@@ -173,9 +176,10 @@ private fun Item2(
             )
         }
 
-        Canvas(modifier = Modifier
-            .fillMaxSize()
-            .height(1.dp)
+        Canvas(
+            modifier = Modifier
+                .fillMaxSize()
+                .height(1.dp)
         ) {
             itemLine(Gray)
         }
@@ -251,8 +255,6 @@ fun Item3(
         Text(
             text = stringResource(R.string.delete),
             color = if (canDelete) Red else AppTheme.colorScheme.disable,
-            fontSize = 16.sp,
-            fontFamily = FontFamily.Default,
             style = AppTheme.typography.subhead
         )
     }

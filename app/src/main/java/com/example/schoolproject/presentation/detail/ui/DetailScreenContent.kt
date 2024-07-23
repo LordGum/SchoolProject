@@ -25,11 +25,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.schoolproject.R
 import com.example.schoolproject.domain.entities.TodoItem
 import com.example.schoolproject.presentation.ui_elements.PreviewData
@@ -48,7 +46,7 @@ fun DetailScreenContent(
     item: TodoItem
 ) {
     val currentItem = rememberSaveable { mutableStateOf(item) }
-    val errorState = rememberSaveable{ mutableStateOf(false) }
+    val errorState = rememberSaveable { mutableStateOf(false) }
     val scrollState = rememberLazyListState()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
@@ -70,13 +68,14 @@ fun DetailScreenContent(
                 },
                 actions = {
                     TextButton(onClick = {
-                        if (currentItem.value.text.trim().isNotBlank()) onSaveClickListener(currentItem.value)
+                        if (currentItem.value.text.trim().isNotBlank()) onSaveClickListener(
+                            currentItem.value
+                        )
                         else errorState.value = true
                     }) {
                         Text(
                             text = stringResource(R.string.save),
-                            fontSize = 14.sp,
-                            fontFamily = FontFamily.Default,
+                            style = AppTheme.typography.button,
                             color = Blue
                         )
                     }
@@ -87,14 +86,14 @@ fun DetailScreenContent(
             )
         },
         content = { paddingValues ->
-            Box (
+            Box(
                 modifier = Modifier
                     .padding(paddingValues)
                     .fillMaxSize()
                     .background(AppTheme.colorScheme.backPrimary)
                     .verticalScroll(rememberScrollState())
                     .fillMaxSize()
-            ){
+            ) {
                 Column {
                     DetailComment(
                         onItemChange = { newItem ->

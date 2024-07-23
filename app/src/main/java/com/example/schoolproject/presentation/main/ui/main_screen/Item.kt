@@ -97,11 +97,8 @@ fun Item(
                                 .background(AppTheme.colorScheme.backSecondary)
                                 .fillMaxWidth(),
                             text = finalText,
-                            style = TextStyle(
-                                fontFamily = FontFamily.Default,
-                                fontSize = 16.sp,
-                                color = AppTheme.colorScheme.tertiary
-                            )
+                            color = AppTheme.colorScheme.tertiary,
+                            style = AppTheme.typography.subhead
                         )
                     }
                 }

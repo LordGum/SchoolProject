@@ -8,23 +8,21 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.schoolproject.R
 import com.example.schoolproject.ui.theme.AppTheme
 
 @Composable
 fun Title() {
-    Box(modifier = Modifier
-        .height(124.dp)
-        .fillMaxWidth()
-        .padding(start = 60.dp, top = 82.dp)
+    Box(
+        modifier = Modifier
+            .height(124.dp)
+            .fillMaxWidth()
+            .padding(start = 60.dp, top = 82.dp)
     ) {
         Text(
             text = stringResource(R.string.title),
-            fontSize = 32.sp,
-            fontFamily = FontFamily.Default,
+            style = AppTheme.typography.largeTitle,
             color = AppTheme.colorScheme.primary
         )
     }

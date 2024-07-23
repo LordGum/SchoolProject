@@ -96,7 +96,7 @@ fun TopAppBar(
                         Text(
                             text = stringResource(R.string.underlable, doneTasks),
                             color = AppTheme.colorScheme.tertiary,
-                            style = AppTheme.typography.body,
+                            style = AppTheme.typography.title,
                             modifier = Modifier.padding(top = 4.dp)
                         )
 

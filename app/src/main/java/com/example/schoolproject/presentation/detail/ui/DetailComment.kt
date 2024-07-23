@@ -13,9 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.schoolproject.R
 import com.example.schoolproject.domain.entities.TodoItem
 import com.example.schoolproject.ui.theme.AppTheme
@@ -37,9 +35,8 @@ fun DetailComment(
         placeholder = {
             Text(
                 text = stringResource(R.string.place_holder),
-                fontSize = 16.sp,
-                fontFamily = FontFamily.Default,
-                color = AppTheme.colorScheme.tertiary
+                color = AppTheme.colorScheme.tertiary,
+                style = AppTheme.typography.body
             )
         },
         modifier = Modifier

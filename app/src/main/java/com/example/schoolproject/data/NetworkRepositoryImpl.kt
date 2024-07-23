@@ -38,8 +38,6 @@ class NetworkRepositoryImpl @Inject constructor(
     private val _todoList = MutableStateFlow<List<ElementDto>>(emptyList())
     override val todoList = _todoList.asStateFlow()
 
-    private val _revision = MutableStateFlow(0)
-
     private val _errorState: MutableStateFlow<ErrorState?> = MutableStateFlow(null)
     override val errorState: StateFlow<ErrorState?>
         get() = _errorState.asStateFlow()
@@ -92,53 +90,54 @@ class NetworkRepositoryImpl @Inject constructor(
 
     override fun getAuthStateFlow(): Flow<AuthState> = authStateFlow
 
-    override suspend fun checkAuthState() { checkAuthStateEvents.emit(Unit) }
+    override suspend fun checkAuthState() {
+        checkAuthStateEvents.emit(Unit)
+    }
 
     override suspend fun getTodoList() {
         if (checkInternet()) {
             val response = handle { apiService.loadTodoItemList() }
             _todoList.update { response.list }
-            _revision.update { response.revision }
         }
     }
 
     override suspend fun deleteTodoItem(id: String) {
         if (checkInternet()) {
-            val response = handle {
-                apiService.deleteTodoItem(id, _revision.value)
+            val revision = handle { apiService.loadTodoItemList() }.revision
+            handle {
+                apiService.deleteTodoItem(id, revision)
             }
-            _revision.update { response.revision }
         }
     }
 
     override suspend fun addTodoItem(todoItem: TodoItem) {
         if (checkInternet()) {
-            val response = handle {
+            val revision = handle { apiService.loadTodoItemList() }.revision
+            handle {
                 val element = ReturnElementDto(mapper.mapEntityToElement(todoItem))
-                apiService.addTodoItem(_revision.value, element)
+                apiService.addTodoItem(revision, element)
             }
-            _revision.update { response.revision }
         }
     }
 
     override suspend fun refactorTodoItem(todoItem: TodoItem) {
         if (checkInternet()) {
-            val response = handle {
+            val revision = handle { apiService.loadTodoItemList() }.revision
+            handle {
                 val element = ReturnElementDto(mapper.mapEntityToElement(todoItem))
-                apiService.refactorTodoItem(todoItem.id, _revision.value, element)
+                apiService.refactorTodoItem(todoItem.id, revision, element)
             }
-            _revision.update { response.revision }
         }
     }
 
     override suspend fun refreshTodoItemList(list: List<TodoItem>) {
         if (checkInternet()) {
+            val revision = handle { apiService.loadTodoItemList() }.revision
             val response = handle {
                 val returnList = ReturnElementListDto(list.map { mapper.mapEntityToElement(it) })
-                apiService.updateTodoItemListOnService(_revision.value, returnList)
+                apiService.updateTodoItemListOnService(revision, returnList)
             }
             _todoList.update { response.list }
-            _revision.update { response.revision }
         }
     }
 }

@@ -31,6 +31,7 @@ fun DetailScreen(
                 }
             )
         }
+
         is DetailScreenState.AddTodoItemState -> {
             DetailScreenContent(
                 onBackClickListener = onBackClickListener,
@@ -42,9 +43,11 @@ fun DetailScreen(
                 }
             )
         }
+
         is DetailScreenState.LoadingState -> {
             LoadingScreen()
         }
+
         is DetailScreenState.ErrorState -> {
             ErrorScreen()
         }

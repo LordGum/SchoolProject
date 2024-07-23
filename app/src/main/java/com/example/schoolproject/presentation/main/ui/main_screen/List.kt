@@ -20,7 +20,7 @@ import com.example.schoolproject.ui.theme.AppTheme
 @Composable
 fun List(
     list: List<TodoItem>,
-    onDeleteClick: (String) -> Unit,
+    onDeleteClick: (TodoItem) -> Unit,
     onDoneClick: (TodoItem) -> Unit,
     onTodoItemClick: (TodoItem) -> Unit,
     visibilityState: Boolean
@@ -37,12 +37,13 @@ fun List(
         ) {
             items(items = list, key = { it.id }) { item ->
                 if (!item.isCompleted || visibilityState) {
+
                     SwipedTodoListItem(
                         item = item,
                         onTodoItemClickListener = onTodoItemClick,
-                        onDeleteSwipe = { onDeleteClick(item.id) },
+                        onDeleteSwipe = { onDeleteClick(item) },
                         modifier = Modifier.animateItemPlacement(
-                            animationSpec = tween(durationMillis = 0)
+                            animationSpec = tween(durationMillis = 200)
                         ),
                         onDoneClick = onDoneClick
                     )
