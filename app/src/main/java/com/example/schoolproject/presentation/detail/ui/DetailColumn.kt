@@ -28,7 +28,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
@@ -39,6 +42,7 @@ import com.example.schoolproject.ui.theme.AppTheme
 import com.example.schoolproject.ui.theme.Blue
 import com.example.schoolproject.ui.theme.Gray
 import com.example.schoolproject.ui.theme.Red
+import okhttp3.internal.format
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -55,15 +59,15 @@ fun DetailColumn(
             .padding(0.dp, 16.dp, 12.dp, 16.dp),
         verticalArrangement = Arrangement.Center
     ) {
-        Item1(
+        PriorityUI(
             item = item,
             onItemChange = onItemChange
         )
-        Item2(
+        DeadlineUI(
             item = item,
             onItemChange = onItemChange
         )
-        Item3(
+        DeleteButtonUI(
             canDelete = item.text.isNotBlank(),
             onDeleteIconClickListener = onDeleteIconClickListener
         )
@@ -71,14 +75,14 @@ fun DetailColumn(
 }
 
 @Composable
-private fun Item1(
+private fun PriorityUI(
     item: TodoItem,
     onItemChange: (TodoItem) -> Unit
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .height(72.dp)
+            .height(92.dp)
             .padding(start = 0.dp, 8.dp),
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.SpaceAround
@@ -117,7 +121,7 @@ private fun DrawScope.itemLine(
 }
 
 @Composable
-private fun Item2(
+private fun DeadlineUI(
     item: TodoItem,
     onItemChange: (TodoItem) -> Unit
 ) {
@@ -125,6 +129,8 @@ private fun Item2(
     val openDialogState = rememberSaveable { mutableStateOf(false) }
     val currentItem = rememberSaveable { mutableStateOf(item) }
     val formatter = SimpleDateFormat("dd MMMM yyyy", Locale.getDefault())
+
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -140,16 +146,35 @@ private fun Item2(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column(
-                modifier = Modifier.clickable {
-                    openDialogState.value = true
-                },
+                modifier = Modifier
+                    .clickable(
+                        onClickLabel = if (currentItem.value.deadline == null) {
+                            stringResource(R.string.add_deadline)
+                        } else stringResource(R.string.change_deadline)
+                    ) {
+                        openDialogState.value = true
+                    }
+                    .semantics(mergeDescendants = true) {
+                        contentDescription = if (currentItem.value.deadline != null) {
+                            format(
+                                context.getString(R.string.deadline),
+                                formatter.format(
+                                    currentItem.value.deadline
+                                        ?: throw RuntimeException("date is null")
+                                )
+                            )
+                        } else {
+                            context.getString(R.string.no_deadline)
+                        }
+                    },
                 horizontalAlignment = Alignment.Start,
                 verticalArrangement = Arrangement.SpaceAround
             ) {
                 Text(
                     text = stringResource(R.string.deadline),
                     color = AppTheme.colorScheme.primary,
-                    style = AppTheme.typography.body
+                    style = AppTheme.typography.body,
+                    modifier = Modifier.semantics { contentDescription = "" }
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 if (currentItem.value.deadline != null) {
@@ -210,8 +235,13 @@ fun CustomSwitch(
     onOpenDialogChange: (Boolean) -> Unit,
     onCheckStateChange: (Boolean) -> Unit
 ) {
+    val context = LocalContext.current
     Switch(
-        modifier = Modifier.semantics {},
+        modifier = Modifier.semantics {
+            contentDescription = if (checkState) {
+                context.getString(R.string.delete_deadline)
+            } else context.getString(R.string.add_deadline)
+        },
         checked = checkState,
         onCheckedChange = {
             onOpenDialogChange(it)
@@ -237,22 +267,31 @@ fun CustomSwitch(
     )
 }
 
+// Здесь contentDescription = null и Modifier.semantics { contentDescription = "" }
+// чтобы не было повторения информациии
+
 @Composable
-fun Item3(
+fun DeleteButtonUI(
     canDelete: Boolean,
     onDeleteIconClickListener: () -> Unit
 ) {
+    val context = LocalContext.current
     TextButton(
+        modifier = Modifier.semantics(mergeDescendants = true) {
+            contentDescription = if (canDelete) context.getString(R.string.delete_task)
+            else context.getString(R.string.refuse_delete_empty_task)
+        },
         onClick = onDeleteIconClickListener,
         enabled = canDelete
     ) {
         Icon(
             imageVector = Icons.Default.Delete,
-            contentDescription = stringResource(R.string.delete_button_desc),
+            contentDescription = null,
             tint = if (canDelete) Red else AppTheme.colorScheme.disable,
             modifier = Modifier.size(24.dp)
         )
         Text(
+            modifier = Modifier.clearAndSetSemantics { },
             text = stringResource(R.string.delete),
             color = if (canDelete) Red else AppTheme.colorScheme.disable,
             style = AppTheme.typography.subhead

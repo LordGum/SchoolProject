@@ -1,6 +1,5 @@
 package com.example.schoolproject.presentation.main.ui.main_screen
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -115,9 +114,11 @@ fun MainScreenContent(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         snackbarHost = {
             SnackbarHost(
-                hostState = snackBarHostState,
-                modifier = Modifier.background(AppTheme.colorScheme.backPrimary)
-            )
+                hostState = snackBarHostState
+            ) { data ->
+                CustomSnackBar(data)
+
+            }
         },
         topBar = {
             TopAppBar(

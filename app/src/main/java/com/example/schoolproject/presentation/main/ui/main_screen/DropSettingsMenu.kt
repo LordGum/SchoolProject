@@ -27,9 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.schoolproject.R
 import com.example.schoolproject.ui.theme.AppTheme
@@ -39,7 +37,8 @@ import com.example.schoolproject.ui.theme.Gray
 @Composable
 fun DropSettingsMenu(
     isDark: Boolean,
-    onThemeChange:(Boolean) -> Unit
+    onThemeChange:(Boolean) -> Unit,
+    modifier: Modifier
 ) {
     val currentTheme = isSystemInDarkTheme()
     val isClicked = remember { mutableStateOf(false) }
@@ -59,7 +58,7 @@ fun DropSettingsMenu(
             shape = CircleShape,
             elevation = FloatingActionButtonDefaults.elevation(),
             containerColor = Gray,
-            modifier = Modifier.size(35.dp)
+            modifier = modifier.size(35.dp)
         ) {
             Icon(
                 imageVector = Icons.Filled.Settings,

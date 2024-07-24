@@ -24,7 +24,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -49,6 +54,7 @@ fun DetailScreenContent(
     val errorState = rememberSaveable { mutableStateOf(false) }
     val scrollState = rememberLazyListState()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+    val context = LocalContext.current
 
     Scaffold(
         modifier = Modifier
@@ -62,7 +68,7 @@ fun DetailScreenContent(
                         Icon(
                             imageVector = Icons.Filled.Close,
                             tint = AppTheme.colorScheme.primary,
-                            contentDescription = stringResource(R.string.close_description)
+                            contentDescription = stringResource(R.string.return_to_main_screen)
                         )
                     }
                 },
@@ -76,7 +82,11 @@ fun DetailScreenContent(
                         Text(
                             text = stringResource(R.string.save),
                             style = AppTheme.typography.button,
-                            color = Blue
+                            color = Blue,
+                            modifier = Modifier.semantics {
+                                role = Role.Button
+                                contentDescription = context.getString(R.string.save_todo_item)
+                            }
                         )
                     }
                 },
