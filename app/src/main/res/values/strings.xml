@@ -62,4 +62,7 @@
     <string name="change">изменить</string>
     <string name="task_done">задача сделана</string>
     <string name="task_not_done">задача не сделана</string>
+    <string name="turn_on_light">включить светлую тему</string>
+    <string name="turn_on_dark">включить темную тему</string>
+    <string name="turn_on_like_in_system">включить тему как в системе</string>
 </resources>
