@@ -12,7 +12,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.example.schoolproject.R
 import com.example.schoolproject.domain.entities.TodoItem
@@ -24,6 +27,7 @@ fun DetailComment(
     onItemChange: (TodoItem) -> Unit,
     errorState: Boolean
 ) {
+    val context = LocalContext.current
     val textState = rememberSaveable { mutableStateOf(item.text) }
 
     TextField(
@@ -34,6 +38,9 @@ fun DetailComment(
         },
         placeholder = {
             Text(
+                modifier = Modifier.semantics {
+                    contentDescription = context.getString(R.string.place_for_edit)
+                },
                 text = stringResource(R.string.place_holder),
                 color = AppTheme.colorScheme.tertiary,
                 style = AppTheme.typography.body

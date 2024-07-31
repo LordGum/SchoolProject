@@ -24,9 +24,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -96,31 +99,48 @@ fun TopAppBar(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.Bottom
                     ) {
+                        val context = LocalContext.current
                         Text(
                             text = stringResource(R.string.underlable, doneTasks),
                             color = AppTheme.colorScheme.tertiary,
                             style = AppTheme.typography.title,
-                            modifier = Modifier.padding(top = 4.dp).semantics {
-                                contentDescription = when(doneTasks) {
-                                    0 -> "Выполнено 0 задач"
-                                    1 -> "Выполнена 1 задача"
-                                    else -> {
-                                        val ost = doneTasks%10
-                                        when (ost) {
-                                            2, 3, 4 -> format("Выполнено %d задачи", doneTasks)
-                                            else -> format("Выполнено %d задач", doneTasks)
+                            modifier = Modifier
+                                .padding(top = 4.dp)
+                                .semantics {
+                                    contentDescription = when (doneTasks) {
+                                        0 -> context.getString(R.string.under_lable_0)
+                                        1 -> context.getString(R.string.under_lable_1)
+                                        else -> {
+                                            val ost = doneTasks % 10
+                                            when (ost) {
+                                                2, 3, 4 -> format(
+                                                    context.getString(R.string.under_lable_2_3_4),
+                                                    doneTasks
+                                                )
+
+                                                else -> format(
+                                                    context.getString(R.string.under_lable_else),
+                                                    doneTasks
+                                                )
+                                            }
                                         }
                                     }
                                 }
-                            }
                         )
 
                         IconButton(
                             onClick = { onVisibilityIconClick() },
                             modifier = Modifier
-                                .clickable { onVisibilityIconClick() }
+                                .clickable(
+                                    onClick = { onVisibilityIconClick() },
+                                    onClickLabel = if (visibilityState) stringResource(R.string.off_done_tasks)
+                                    else stringResource(R.string.on_done_tasks)
+                                )
                                 .padding(horizontal = 20.dp)
                                 .size(24.dp)
+                                .semantics {
+                                    role = Role.Button
+                                }
                         ) {
                             Icon(
                                 modifier = Modifier.size(24.dp),
@@ -129,7 +149,7 @@ fun TopAppBar(
                                     else R.drawable.ic_visibility_off
                                 ),
                                 tint = Blue,
-                                contentDescription = stringResource(R.string.visibility_button_desc)
+                                contentDescription = null
                             )
                         }
                     }

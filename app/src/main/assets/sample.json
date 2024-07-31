@@ -101,7 +101,7 @@
                   "type": "separator",
                   "height": {
                     "type": "fixed",
-                    "value": 440
+                    "value": 100
                   },
                   "alpha": 0
                 },
@@ -120,6 +120,10 @@
                     "type": "fixed",
                     "value": 120
                   },
+                  "height": {
+                    "type": "fixed",
+                    "value": 40
+                  },
                   "actions": [
                     {
                       "log_id": "button_next",
@@ -133,10 +137,6 @@
                     "right": 28,
                     "bottom": 8,
                     "left": 28
-                  },
-                  "height": {
-                    "type": "fixed",
-                    "value": 30
                   }
                 },
                 {
@@ -144,20 +144,6 @@
                   "height": {
                     "type": "fixed",
                     "value": 10
-                  },
-                  "alpha": 0
-                },
-                {
-                  "type": "text",
-                  "text": "Нажмите на \"Далее\", чтобы продолжить",
-                  "font_size": 12,
-                  "text_alignment_horizontal": "center"
-                },
-                {
-                  "type": "separator",
-                  "height": {
-                    "type": "fixed",
-                    "value": 50
                   },
                   "alpha": 0
                 }

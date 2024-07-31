@@ -27,8 +27,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextDecoration
@@ -47,19 +52,26 @@ import java.util.Locale
 
 @Composable
 fun Item(
-    item: TodoItem,
-    onDoneClick: (TodoItem) -> Unit,
-    onTodoItemClickListener: (TodoItem) -> Unit
+    item: TodoItem, onDoneClick: (TodoItem) -> Unit, onTodoItemClickListener: (TodoItem) -> Unit
 ) {
     val checked = item.isCompleted
-
-    Column(
-        modifier = Modifier.clickable (
+    val context = LocalContext.current
+    Column(modifier = Modifier
+        .clickable(
             onClick = { onTodoItemClickListener(item) },
             interactionSource = remember { MutableInteractionSource() },
-            indication = rememberRipple()
+            indication = rememberRipple(),
+            onClickLabel = stringResource(R.string.open_detail_screen)
         )
-    ) {
+        .semantics(
+            mergeDescendants = true
+        ) {
+            contentDescription = when (item.priority) {
+                TodoItem.Priority.LOW -> context.getString(R.string.low)
+                TodoItem.Priority.NORMAL -> context.getString(R.string.normal)
+                TodoItem.Priority.HIGH -> context.getString(R.string.high)
+            }
+        }) {
         Row(
             modifier = Modifier
                 .background(AppTheme.colorScheme.backSecondary)
@@ -67,8 +79,7 @@ fun Item(
                 .fillMaxWidth()
         ) {
             CustomCheckbox(
-                onDoneClick = onDoneClick,
-                item = item
+                onDoneClick = onDoneClick, item = item
             )
             Spacer(modifier = Modifier.width(12.dp))
             Box(modifier = Modifier.weight(10f)) {
@@ -105,7 +116,7 @@ fun Item(
             }
             Icon(
                 painter = painterResource(id = R.drawable.ic_info),
-                contentDescription = stringResource(R.string.info_button_description),
+                contentDescription = null,
                 tint = AppTheme.colorScheme.separator,
                 modifier = Modifier.weight(1f)
             )
@@ -115,35 +126,38 @@ fun Item(
 
 @Composable
 fun CustomCheckbox(
-    onDoneClick: (TodoItem) -> Unit,
-    item: TodoItem
+    onDoneClick: (TodoItem) -> Unit, item: TodoItem
 ) {
+    val context = LocalContext.current
     val checked = item.isCompleted
     val isHigh = item.priority == TodoItem.Priority.HIGH
-    Box(
-        modifier = Modifier
-            .size(24.dp)
-            .border(
-                BorderStroke(
-                    1.dp, color =
-                    if (isHigh && !checked) Color.Red else AppTheme.colorScheme.separator
-                ),
-                shape = RoundedCornerShape(3.dp)
-            )
-            .background(
-                color = if (checked) Green else {
-                    if (isHigh) Color.Red.copy(alpha = 0.15f)
-                    else AppTheme.colorScheme.backSecondary
-                },
-                shape = RoundedCornerShape(3.dp)
-            )
-            .alpha(15f)
-            .clickable {
+    Box(modifier = Modifier
+        .size(24.dp)
+        .border(
+            BorderStroke(
+                1.dp, color = if (isHigh && !checked) Color.Red else AppTheme.colorScheme.separator
+            ), shape = RoundedCornerShape(3.dp)
+        )
+        .background(
+            color = if (checked) Green else {
+                if (isHigh) Color.Red.copy(alpha = 0.15f)
+                else AppTheme.colorScheme.backSecondary
+            }, shape = RoundedCornerShape(3.dp)
+        )
+        .alpha(15f)
+        .clickable(
+            onClick = {
                 CoroutineScope(Dispatchers.IO).launch {
                     onDoneClick(item)
                 }
-            }
-    ) {
+            }, onClickLabel = stringResource(R.string.change)
+        )
+        .semantics {
+            role = Role.Checkbox
+            contentDescription =
+                if (checked) context.getString(R.string.task_done)
+                else context.getString(R.string.task_not_done)
+        }) {
         if (checked) {
             Icon(
                 imageVector = Icons.Default.Check,

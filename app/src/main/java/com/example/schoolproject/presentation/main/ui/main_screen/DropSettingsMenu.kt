@@ -27,9 +27,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.isTraversalGroup
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.unit.dp
 import com.example.schoolproject.R
 import com.example.schoolproject.ui.theme.AppTheme
@@ -39,8 +43,10 @@ import com.example.schoolproject.ui.theme.Gray
 @Composable
 fun DropSettingsMenu(
     isDark: Boolean,
-    onThemeChange:(Boolean) -> Unit
+    onThemeChange:(Boolean) -> Unit,
+    modifier: Modifier
 ) {
+    val context = LocalContext.current
     val currentTheme = isSystemInDarkTheme()
     val isClicked = remember { mutableStateOf(false) }
     val heightSize = animateDpAsState(
@@ -50,7 +56,9 @@ fun DropSettingsMenu(
 
     Column(
         verticalArrangement = Arrangement.Center,
-        modifier = Modifier.padding(start = 40.dp)
+        modifier = Modifier.padding(start = 40.dp).semantics {
+            isTraversalGroup = true
+        }
     ) {
         FloatingActionButton(
             onClick = {
@@ -59,7 +67,7 @@ fun DropSettingsMenu(
             shape = CircleShape,
             elevation = FloatingActionButtonDefaults.elevation(),
             containerColor = Gray,
-            modifier = Modifier.size(35.dp)
+            modifier = modifier.size(35.dp).semantics { traversalIndex = 1f }
         ) {
             Icon(
                 imageVector = Icons.Filled.Settings,
@@ -86,7 +94,11 @@ fun DropSettingsMenu(
                         isClicked.value = false
                         if (isDark) onThemeChange(false)
                     },
-                    id = R.drawable.ic_light_theme
+                    id = R.drawable.ic_light_theme,
+                    modifier = Modifier.semantics(mergeDescendants = true) {
+                        contentDescription = context.getString(R.string.turn_on_light)
+                        traversalIndex = 2f
+                    }
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 CustomButton(
@@ -94,7 +106,11 @@ fun DropSettingsMenu(
                         isClicked.value = false
                         if (!isDark) onThemeChange(true)
                     },
-                    id = R.drawable.ic_dark_theme
+                    id = R.drawable.ic_dark_theme,
+                    modifier = Modifier.semantics(mergeDescendants = true) {
+                        contentDescription = context.getString(R.string.turn_on_dark)
+                        traversalIndex = 3f
+                    }
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 CustomButton(
@@ -103,7 +119,11 @@ fun DropSettingsMenu(
                         if (currentTheme) onThemeChange(true)
                         else onThemeChange(false)
                     },
-                    id = R.drawable.ic_settings
+                    id = R.drawable.ic_settings,
+                    modifier = Modifier.semantics(mergeDescendants = true) {
+                        contentDescription = context.getString(R.string.turn_on_like_in_system)
+                        traversalIndex = 4f
+                    }
                 )
                 Spacer(modifier = Modifier.height(10.dp))
             }
@@ -114,11 +134,13 @@ fun DropSettingsMenu(
 @Composable
 fun CustomButton(
     onButtonClick: () -> Unit,
-    id: Int
+    id: Int,
+    modifier: Modifier
 ) {
     Surface(
         shape = CircleShape,
-        border = BorderStroke(1.dp, AppTheme.colorScheme.separator)
+        border = BorderStroke(1.dp, AppTheme.colorScheme.separator),
+        modifier = modifier
     ) {
         IconButton(
             onClick = onButtonClick,
@@ -126,6 +148,7 @@ fun CustomButton(
                 .size(30.dp)
                 .padding(5.dp)
                 .background(color = AppTheme.colorScheme.backSecondary)
+                .clearAndSetSemantics {  }
         ) {
             Icon(
                 painter = painterResource(id),
